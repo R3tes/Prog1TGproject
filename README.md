@@ -1,4 +1,4 @@
-# <ins>ImageViewer1</ins>
+# <ins>ImageViewer</ins>
 
 ---
 ---
