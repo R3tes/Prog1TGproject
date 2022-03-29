@@ -1,7 +1,5 @@
 # <ins>ImageViewer</ins>
 
-teszt
-
 ---
 ---
 
