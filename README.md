@@ -13,7 +13,7 @@ Az alkalmazás a képmegjelenítés mellett olyan <ins>**funkciókkal is rendelk
 * **elforgatás és tükrözés**
 * **albumhoz hozzáadás**
 * **képbe rajzolás**
-* 
+* **bemutató (slideshow)**
 
 ---
 
