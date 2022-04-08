@@ -59,6 +59,9 @@ Mindemellett az alkalmazás olyan <ins>**alapinfromációk és műveletek**</ins
 ### 3. A kép adatainak megtekintése
 > Az alkalmazás által megnyitott képek bővebb információit is lehetőségünk van megtekinteni. Ezt a bal felső sarokban található **•••** ikonra nyomva tudjuk elérni, itt pedig a **Kép adatai** menüpontot kell kiválasztanunk. A felugró ablakban olyan adatokat is megtekinthetünk mint a kép méretét, elkészülésének és változtatásoknak időpontját, elérési útvonalát a számítógépen, valamint láthatjuk és meg is változtathatjuk a kép nevét egy szövegdobozon belül.
 
+### 4. Programbővítés saját fájlokból
+> Az alkalmazás bővíthető saját class fájlok elkészítésével és beimportálásával a programba. Annak érdekében, hogy ezt megtegyük a magunk által elkészített osztályt bele kell helyeznünk a "bovitesiosztalyok" folderba és onnan a programba már meg is hívhatjuk.
+
 ---
 ---
 
@@ -68,3 +71,11 @@ Mindemellett az alkalmazás olyan <ins>**alapinfromációk és műveletek**</ins
 > Windows Vista, Windows 7, Windows 8, Windows 10, Windows 11, macOS, Linux
 
 ### • Java
+
+---
+
+## Az alkalmazást készítették:
+
+- Balázs Fülöp Mátyás <br>
+- Búcsú Áron
+- Gordos Bence
