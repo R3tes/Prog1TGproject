@@ -1,6 +1,7 @@
 module com.example.prog1tgproject {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
 
 
     opens com.example.prog1tgproject to javafx.fxml;
