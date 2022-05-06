@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class Home {
@@ -29,7 +30,8 @@ public class Home {
     @FXML
     private MenuButton opButton;
 
-    File currentFile;
+    private File currentFile;
+    public static BufferedImage img;
 
     @FXML
     private void initialize() {
@@ -48,7 +50,7 @@ public class Home {
         opButton.getItems().add(prop);
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File("src/main/resources/AppPictures/Others"));
+        //fileChooser.setInitialDirectory(new File("src/main/resources/AppPictures/Others"));
 
         open.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -57,6 +59,11 @@ public class Home {
                 if (file != null) {
                     currentFile = file;
                     Image image = new Image(file.toURI().toString());
+                    try {
+                        img = ImageIO.read(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     imageView.setImage(image);
                 }
             }
@@ -77,14 +84,8 @@ public class Home {
             public void handle(ActionEvent actionEvent) {
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
-                    BufferedImage bufferedImage = null;
                     try {
-                        bufferedImage = ImageIO.read(currentFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        ImageIO.write(bufferedImage, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        ImageIO.write(img, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -106,16 +107,26 @@ public class Home {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        for (Plugin plugin :
-                plugins) {
-            Button button = new Button(plugin.getName());
-            button.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    plugin.process(imageView);
-                }
-            });
-            toolBar.getItems().add(button);
+        for (Plugin plugin : plugins) {
+
+            String[] paths = plugin.getImagePaths();
+            for (int i = 0; i < paths.length; i++) {
+                Button button = new Button();
+                URL _url = getClass().getResource(paths[i]);
+                ImageView image = new ImageView(new Image(_url.toExternalForm()));
+                image.setFitWidth(20);
+                image.setFitHeight(18);
+                button.setGraphic(image);
+
+                int finalI = i;
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        plugin.process(imageView, finalI);
+                    }
+                });
+                toolBar.getItems().add(button);
+            }
         }
     }
 

@@ -6,12 +6,12 @@ import javafx.scene.image.ImageView;
 public class Zoom implements Plugin {
 
     @Override
-    public String getName() {
-        return "Zoom";
+    public String[] getImagePaths() {
+        return new String[]{"/media/magnifier.png"};
     }
 
     @Override
-    public void process(ImageView imageView) {
+    public void process(ImageView imageView, int code) {
         System.out.println("Zoom");
     }
 }
