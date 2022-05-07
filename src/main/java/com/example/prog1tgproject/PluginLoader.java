@@ -15,8 +15,11 @@ public class PluginLoader {
 
         Set<Class> classes = findAllClassesUsingClassLoader("com.example.prog1tgproject.plugins");
 
-        for (Class c :
-                classes) {
+        Set<Class> sortedClasses = classes.stream()
+                .sorted(Comparator.comparing(Class::getCanonicalName))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        for (Class c : sortedClasses) {
             plugins.add((Plugin) c.getDeclaredConstructor().newInstance());
         }
         return plugins;
@@ -37,7 +40,7 @@ public class PluginLoader {
             return Class.forName(packageName + "."
                     + className.substring(0, className.lastIndexOf('.')));
         } catch (ClassNotFoundException e) {
-            // handle the exception
+            e.printStackTrace();
         }
         return null;
     }
