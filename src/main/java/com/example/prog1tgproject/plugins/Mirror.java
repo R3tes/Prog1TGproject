@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 
 import java.awt.image.BufferedImage;
 
-public class Mirror implements Plugin {
+public class Mirror extends Plugin {
 
     private static final int HORIZONTAL = 0;
     private static final int VERTICAL = 1;
@@ -24,7 +24,7 @@ public class Mirror implements Plugin {
 
         if(image != null){
             BufferedImage bimage = Home.img;
-            BufferedImage after = new BufferedImage(bimage.getWidth(), bimage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage after = new BufferedImage(bimage.getWidth(), bimage.getHeight(), BufferedImage.TYPE_INT_RGB);
             int height = bimage.getHeight();
             int width = bimage.getWidth();
 

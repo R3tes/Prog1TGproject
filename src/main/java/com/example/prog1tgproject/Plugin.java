@@ -7,11 +7,12 @@ import javafx.scene.image.WritableImage;
 
 import java.awt.image.BufferedImage;
 
-public interface Plugin {
-    String[] getImagePaths();
-    void process(ImageView imageView, int code);
+public abstract class Plugin {
 
-    static Image convertToFxImage(BufferedImage image) {
+    public abstract String[] getImagePaths();
+    public abstract void process(ImageView imageView, int code);
+
+    protected static Image convertToFxImage(BufferedImage image) {
         WritableImage wr = null;
         if (image != null) {
             wr = new WritableImage(image.getWidth(), image.getHeight());

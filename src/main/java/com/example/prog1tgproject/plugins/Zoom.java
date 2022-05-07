@@ -3,7 +3,7 @@ package com.example.prog1tgproject.plugins;
 import com.example.prog1tgproject.Plugin;
 import javafx.scene.image.ImageView;
 
-public class Zoom implements Plugin {
+public class Zoom extends Plugin {
 
     @Override
     public String[] getImagePaths() {

@@ -8,14 +8,14 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-public class Rotate implements Plugin {
+public class Rotate extends Plugin {
 
-    private static final int RIGHT = 0;
-    private static final int LEFT = 1;
+    private static final int LEFT = 0;
+    private static final int RIGHT = 1;
 
     @Override
     public String[] getImagePaths() {
-        String[] paths = new String[]{"/media/rotate-right.png", "/media/rotate-left.png"};
+        String[] paths = new String[]{"/media/rotate-left.png", "/media/rotate-right.png"};
         return paths;
     }
 
@@ -36,7 +36,7 @@ public class Rotate implements Plugin {
             int newWidth = (int) Math.floor(w * cos + h * sin);
             int newHeight = (int) Math.floor(h * cos + w * sin);
 
-            BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = rotated.createGraphics();
             AffineTransform at = new AffineTransform();
             at.translate((newWidth - w) / 2, (newHeight - h) / 2);
