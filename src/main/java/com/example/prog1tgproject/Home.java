@@ -29,7 +29,17 @@ public class Home {
     @FXML
     private MenuButton opButton;
 
+    @FXML
+    private Button prevImageButton;
+
+    @FXML
+    private Button nextImageButton;
+
+    @FXML
+    private Button slideShowButton;
+
     File currentFile;
+    ImageChanger imageChanger;
 
     @FXML
     private void initialize() {
@@ -48,16 +58,17 @@ public class Home {
         opButton.getItems().add(prop);
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File("src/main/resources/AppPictures/Others"));
+        fileChooser.setInitialDirectory(new File("src/main/resources/AppPictures"));
+        imageChanger = new ImageChanger(new Album("src/main/resources/AppPictures"));
 
         open.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 File file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
                 if (file != null) {
-                    currentFile = file;
-                    Image image = new Image(file.toURI().toString());
-                    imageView.setImage(image);
+                    imageChanger.getAlbum().setPath(file.getParent());
+                    imageChanger.setCurrentImage(file.getAbsolutePath());
+                    imageView.setImage(imageChanger.getCurrentImage());
                 }
             }
         });
@@ -91,6 +102,22 @@ public class Home {
                 }
             }
         });
+
+        prevImageButton.setOnAction(event -> {
+            imageChanger.endSlideShow();
+           imageChanger.previousImage(imageView);
+        });
+
+        nextImageButton.setOnAction(event -> {
+            imageChanger.endSlideShow();
+            imageChanger.nextImage(imageView);
+        });
+
+        slideShowButton.setOnAction(event -> {
+           imageChanger.startSlideShow(imageView);
+        });
+
+
     }
 
     private void loadPlugins() {
@@ -132,5 +159,9 @@ public class Home {
 
         // Return the buffered image
         return bimage;
+    }
+
+    public ImageView getImageView() {
+        return imageView;
     }
 }
