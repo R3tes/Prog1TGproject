@@ -9,6 +9,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
@@ -31,7 +33,7 @@ public class Home {
     private MenuButton opButton;
 
     private File currentFile;
-    public static BufferedImage img;
+    private BufferedImage img;
 
     @FXML
     private void initialize() {
@@ -122,12 +124,27 @@ public class Home {
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        plugin.process(imageView, finalI);
+                        img = plugin.process(imageView, img, finalI);
+                        imageView.setImage(convertToFxImage(img));
                     }
                 });
                 toolBar.getItems().add(button);
             }
         }
+    }
+
+    private Image convertToFxImage(BufferedImage image) {
+        WritableImage wr = null;
+        if (image != null) {
+            wr = new WritableImage(image.getWidth(), image.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    pw.setArgb(x, y, image.getRGB(x, y));
+                }
+            }
+        }
+        return new ImageView(wr).getImage();
     }
 
     public static BufferedImage toBufferedImage(Image img) {

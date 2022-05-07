@@ -3,7 +3,9 @@ package com.example.prog1tgproject.plugins;
 import com.example.prog1tgproject.Plugin;
 import javafx.scene.image.ImageView;
 
-public class Zoom extends Plugin {
+import java.awt.image.BufferedImage;
+
+public class Zoom implements Plugin {
 
     @Override
     public String[] getImagePaths() {
@@ -11,7 +13,8 @@ public class Zoom extends Plugin {
     }
 
     @Override
-    public void process(ImageView imageView, int code) {
+    public BufferedImage process(ImageView imageView, BufferedImage bimage, int code) {
         System.out.println("Zoom");
+        return bimage;
     }
 }

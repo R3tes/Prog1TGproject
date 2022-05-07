@@ -7,23 +7,19 @@ import javafx.scene.image.ImageView;
 
 import java.awt.image.BufferedImage;
 
-public class Mirror extends Plugin {
+public class Mirror implements Plugin {
 
     private static final int HORIZONTAL = 0;
     private static final int VERTICAL = 1;
 
     @Override
     public String[] getImagePaths() {
-        String[] paths = new String[]{"/media/mirror-horizontal.png", "/media/mirror-vertical.png"};
-        return paths;
+        return new String[]{"/media/mirror-horizontal.png", "/media/mirror-vertical.png"};
     }
 
     @Override
-    public void process(ImageView imageView, int code) {
-        Image image = imageView.getImage();
-
-        if(image != null){
-            BufferedImage bimage = Home.img;
+    public BufferedImage process(ImageView imageView, BufferedImage bimage, int code) {
+        if(imageView.getImage() != null){
             BufferedImage after = new BufferedImage(bimage.getWidth(), bimage.getHeight(), BufferedImage.TYPE_INT_RGB);
             int height = bimage.getHeight();
             int width = bimage.getWidth();
@@ -41,12 +37,9 @@ public class Mirror extends Plugin {
                     }
                 }
             }
-
-            Home.img = after;
-            imageView.setImage(Plugin.convertToFxImage(after));
-
+            return after;
         }
-
+        return null;
     }
 
 }

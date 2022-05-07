@@ -40,7 +40,7 @@ public class PluginLoader {
             return Class.forName(packageName + "."
                     + className.substring(0, className.lastIndexOf('.')));
         } catch (ClassNotFoundException e) {
-            // handle the exception
+            e.printStackTrace();
         }
         return null;
     }
