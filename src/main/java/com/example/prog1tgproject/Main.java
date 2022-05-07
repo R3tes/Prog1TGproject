@@ -1,9 +1,11 @@
 package com.example.prog1tgproject;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
@@ -15,6 +17,13 @@ public class Main extends Application {
         stage.setTitle("ImageViewer");
         stage.setScene(scene);
         stage.show();
+        stage.setOnCloseRequest(windowEvent -> {
+            if( ImageChanger.timer != null) {
+                ImageChanger.timer.cancel();
+                ImageChanger.timer.purge();
+                ImageChanger.timer = null;
+            }
+        });
     }
 
     public static void main(String[] args) {
