@@ -73,7 +73,11 @@ public class Home {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
                     imageView.setImage(imageChanger.getCurrentImage());
-                    img = toBufferedImage(imageView.getImage());
+                    try {
+                        img = ImageIO.read(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -122,7 +126,17 @@ public class Home {
             imageChanger.startSlideShow(imageView);
         });
 
+        /*URL _url = getClass().getResource("/media/left-button.png");
+        ImageView image = new ImageView(new Image(_url.toExternalForm()));
+        image.setFitWidth(20);
+        image.setFitHeight(18);
+        prevImageButton.setGraphic(image);
 
+        _url = getClass().getResource("/media/right-button.png");
+        image = new ImageView(new Image(_url.toExternalForm()));
+        image.setFitWidth(20);
+        image.setFitHeight(18);
+        prevImageButton.setGraphic(image);*/
     }
 
     private void loadPlugins() {
@@ -153,7 +167,8 @@ public class Home {
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        plugin.process(imageView, img, finalI);
+                        img = plugin.process(imageView, img, finalI);
+                        imageView.setImage(convertToFxImage(img));
                     }
                 });
                 toolBar.getItems().add(button);
