@@ -105,6 +105,7 @@ public class Home {
                 if (file != null) {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
+                    clearZoom();
                     imageView.setImage(imageChanger.getCurrentImage());
                     try {
                         img = ImageIO.read(file);
@@ -149,16 +150,19 @@ public class Home {
         });
 
         prevImageButton.setOnAction(event -> {
+            clearZoom();
             imageChanger.endSlideShow();
             imageChanger.previousImage(imageView);
         });
 
         nextImageButton.setOnAction(event -> {
+            clearZoom();
             imageChanger.endSlideShow();
             imageChanger.nextImage(imageView);
         });
 
         slideShowButton.setOnAction(event -> {
+            clearZoom();
             imageChanger.startSlideShow(imageView);
         });
 
@@ -218,6 +222,11 @@ public class Home {
             }
         }
         return new ImageView(wr).getImage();
+    }
+
+    public void clearZoom(){
+        imageView.setFitWidth(scrollPane.getWidth());
+        imageView.setFitHeight(scrollPane.getHeight());
     }
 
     public ImageView getImageView() {

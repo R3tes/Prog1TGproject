@@ -26,8 +26,6 @@ public class Zoom implements Plugin {
         }else if(code == ZOOM_OUT){
             Home.zoomProperty.set(Home.zoomProperty.get() / 1.8);
         }
-
-
         return bimage;
     }
 }
