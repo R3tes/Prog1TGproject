@@ -9,6 +9,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
@@ -17,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class Home {
@@ -40,6 +43,7 @@ public class Home {
 
     File currentFile;
     ImageChanger imageChanger;
+    BufferedImage img;
 
     @FXML
     private void initialize() {
@@ -69,6 +73,7 @@ public class Home {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
                     imageView.setImage(imageChanger.getCurrentImage());
+                    img = toBufferedImage(imageView.getImage());
                 }
             }
         });
@@ -105,7 +110,7 @@ public class Home {
 
         prevImageButton.setOnAction(event -> {
             imageChanger.endSlideShow();
-           imageChanger.previousImage(imageView);
+            imageChanger.previousImage(imageView);
         });
 
         nextImageButton.setOnAction(event -> {
@@ -114,7 +119,7 @@ public class Home {
         });
 
         slideShowButton.setOnAction(event -> {
-           imageChanger.startSlideShow(imageView);
+            imageChanger.startSlideShow(imageView);
         });
 
 
@@ -133,17 +138,41 @@ public class Home {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        for (Plugin plugin :
-                plugins) {
-            Button button = new Button(plugin.getName());
-            button.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    plugin.process(imageView);
-                }
-            });
-            toolBar.getItems().add(button);
+        for (Plugin plugin : plugins) {
+
+            String[] paths = plugin.getImagePaths();
+            for (int i = 0; i < paths.length; i++) {
+                Button button = new Button();
+                URL _url = getClass().getResource(paths[i]);
+                ImageView image = new ImageView(new Image(_url.toExternalForm()));
+                image.setFitWidth(20);
+                image.setFitHeight(18);
+                button.setGraphic(image);
+
+                int finalI = i;
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        plugin.process(imageView, img, finalI);
+                    }
+                });
+                toolBar.getItems().add(button);
+            }
         }
+    }
+
+    private Image convertToFxImage(BufferedImage image) {
+        WritableImage wr = null;
+        if (image != null) {
+            wr = new WritableImage(image.getWidth(), image.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    pw.setArgb(x, y, image.getRGB(x, y));
+                }
+            }
+        }
+        return new ImageView(wr).getImage();
     }
 
     public static BufferedImage toBufferedImage(Image img) {
