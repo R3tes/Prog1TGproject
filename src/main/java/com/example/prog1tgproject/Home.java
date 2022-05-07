@@ -97,14 +97,17 @@ public class Home {
             public void handle(ActionEvent actionEvent) {
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
-                    BufferedImage bufferedImage = null;
                     try {
-                        bufferedImage = ImageIO.read(currentFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        ImageIO.write(bufferedImage, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        boolean isSaved = ImageIO.write(img, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        if(!isSaved){
+                            BufferedImage image = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
+                            for (int y = 0; y < img.getHeight(); y++) {
+                                for (int x = 0; x < img.getWidth(); x++) {
+                                    image.setRGB(x,y,img.getRGB(x,y));
+                                }
+                            }
+                            ImageIO.write(image, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

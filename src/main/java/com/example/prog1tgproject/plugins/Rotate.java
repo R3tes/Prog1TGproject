@@ -33,7 +33,7 @@ public class Rotate implements Plugin {
             int newWidth = (int) Math.floor(w * cos + h * sin);
             int newHeight = (int) Math.floor(h * cos + w * sin);
 
-            BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+            BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = rotated.createGraphics();
             AffineTransform at = new AffineTransform();
             at.translate((float)(newWidth - w) / 2, (float)(newHeight - h) / 2);

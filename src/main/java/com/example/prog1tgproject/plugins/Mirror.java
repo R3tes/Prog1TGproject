@@ -20,7 +20,7 @@ public class Mirror implements Plugin {
     @Override
     public BufferedImage process(ImageView imageView, BufferedImage bimage, int code) {
         if(imageView.getImage() != null){
-            BufferedImage after = new BufferedImage(bimage.getWidth(), bimage.getHeight(), BufferedImage.TYPE_INT_RGB);
+            BufferedImage after = new BufferedImage(bimage.getWidth(), bimage.getHeight(), BufferedImage.TYPE_INT_ARGB);
             int height = bimage.getHeight();
             int width = bimage.getWidth();
 
