@@ -1,16 +1,24 @@
 package com.example.prog1tgproject;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
@@ -41,14 +49,39 @@ public class Home {
     @FXML
     private Button slideShowButton;
 
+    @FXML
+    private ScrollPane scrollPane;
+
     File currentFile;
     ImageChanger imageChanger;
     BufferedImage img;
+
+
+    public final static DoubleProperty zoomProperty = new SimpleDoubleProperty(200);
 
     @FXML
     private void initialize() {
 
         loadPlugins();
+
+        zoomProperty.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable arg0) {
+                imageView.setFitWidth(zoomProperty.get() * 4);
+                imageView.setFitHeight(zoomProperty.get() * 3);
+            }
+        });
+
+        scrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if (event.getDeltaY() > 0) {
+                    zoomProperty.set(zoomProperty.get() * 1.1);
+                } else if (event.getDeltaY() < 0) {
+                    zoomProperty.set(zoomProperty.get() / 1.1);
+                }
+            }
+        });
 
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
@@ -146,13 +179,7 @@ public class Home {
         ArrayList<Plugin> plugins = null;
         try {
             plugins = new PluginLoader().getPlugins();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         for (Plugin plugin : plugins) {
@@ -191,21 +218,6 @@ public class Home {
             }
         }
         return new ImageView(wr).getImage();
-    }
-
-    public static BufferedImage toBufferedImage(Image img) {
-
-
-        // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage((int) img.getWidth(), (int) img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        // Draw the image on to the buffered image
-        Graphics2D bGr = bimage.createGraphics();
-        //bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        // Return the buffered image
-        return bimage;
     }
 
     public ImageView getImageView() {
