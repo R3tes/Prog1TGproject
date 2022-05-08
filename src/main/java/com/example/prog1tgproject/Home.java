@@ -157,33 +157,24 @@ public class Home {
     }
 
     private void loadPlugins() {
-        ArrayList<Plugin> plugins = null;
+        ArrayList<Plugin> plugins;
         try {
             plugins = new PluginLoader().getPlugins();
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        for (Plugin plugin : plugins) {
-
-            String[] paths = plugin.getImagePaths();
-            for (int i = 0; i < paths.length; i++) {
-                Button button = new Button();
-                URL _url = getClass().getResource(paths[i]);
-                ImageView image = new ImageView(new Image(_url.toExternalForm()));
-                image.setFitWidth(20);
-                image.setFitHeight(18);
-                button.setGraphic(image);
-
-                int finalI = i;
-                button.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
+            for (Plugin plugin : plugins) {
+                String[] paths = plugin.getImagePaths();
+                for (int i = 0; i < paths.length; i++) {
+                    Button button = new Button();
+                    setGraphic(button,paths[i], 20, 18);
+                    int finalI = i;
+                    button.setOnAction(event -> {
                         img = plugin.process(imageView, img, finalI);
                         imageView.setImage(convertToFxImage(img));
-                    }
-                });
-                toolBar.getItems().add(button);
+                    });
+                    toolBar.getItems().add(button);
+                }
             }
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 
