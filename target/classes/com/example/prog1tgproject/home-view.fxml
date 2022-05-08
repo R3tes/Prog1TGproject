@@ -7,7 +7,6 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
@@ -25,6 +24,8 @@
           <Button mnemonicParsing="false" text="+" />
             <Button fx:id="slideShowButton" mnemonicParsing="false" text="Lejátszás" />
             <Button mnemonicParsing="false" text="Rajz" />
+            <Button fx:id="zoomInButton" mnemonicParsing="false" />
+            <Button fx:id="zoomOutButton" mnemonicParsing="false" />
         </items>
       </ToolBar>
       <HBox prefHeight="100.0" prefWidth="200.0" />
@@ -32,16 +33,16 @@
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="prevImageButton" mnemonicParsing="false" text="&lt;-" />
+                  <Button fx:id="prevImageButton" mnemonicParsing="false" />
                </children>
             </HBox>
-             <ScrollPane fx:id="scrollPane" prefHeight="471.0" prefWidth="510.0" fitToWidth="true" fitToHeight="true" pannable="true">
+             <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" pannable="true" prefHeight="471.0" prefWidth="510.0">
                <content>
                    <VBox alignment="CENTER">
                        <HBox alignment="CENTER">
                            <VBox fx:id="menuView">
                                <children>
-                                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true"/>
+                                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
                                </children>
                            </VBox>
                        </HBox>
@@ -51,7 +52,7 @@
              </ScrollPane>
             <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="nextImageButton" mnemonicParsing="false" text="-&gt;" />
+                  <Button fx:id="nextImageButton" mnemonicParsing="false" />
                </children>
             </HBox>
          </children>

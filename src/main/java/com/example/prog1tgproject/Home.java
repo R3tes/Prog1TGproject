@@ -41,13 +41,7 @@ public class Home {
     private MenuButton opButton;
 
     @FXML
-    private Button prevImageButton;
-
-    @FXML
-    private Button nextImageButton;
-
-    @FXML
-    private Button slideShowButton;
+    private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
 
     @FXML
     private ScrollPane scrollPane;
@@ -56,32 +50,14 @@ public class Home {
     ImageChanger imageChanger;
     BufferedImage img;
 
-
-    public final static DoubleProperty zoomProperty = new SimpleDoubleProperty(200);
+    Zoom zoom;
 
     @FXML
     private void initialize() {
 
         loadPlugins();
 
-        zoomProperty.addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable arg0) {
-                imageView.setFitWidth(zoomProperty.get() * 4);
-                imageView.setFitHeight(zoomProperty.get() * 3);
-            }
-        });
-
-        scrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
-            @Override
-            public void handle(ScrollEvent event) {
-                if (event.getDeltaY() > 0) {
-                    zoomProperty.set(zoomProperty.get() * 1.1);
-                } else if (event.getDeltaY() < 0) {
-                    zoomProperty.set(zoomProperty.get() / 1.1);
-                }
-            }
-        });
+        zoom = new Zoom(imageView,scrollPane);
 
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
@@ -105,7 +81,7 @@ public class Home {
                 if (file != null) {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
-                    clearZoom();
+                    zoom.clearZoom();
                     imageView.setImage(imageChanger.getCurrentImage());
                     try {
                         img = ImageIO.read(file);
@@ -149,34 +125,35 @@ public class Home {
             }
         });
 
+        setGraphic(prevImageButton, "/media/left-button.png", 25, 25);
         prevImageButton.setOnAction(event -> {
-            clearZoom();
+            zoom.clearZoom();
             imageChanger.endSlideShow();
             imageChanger.previousImage(imageView);
         });
 
+        setGraphic(nextImageButton, "/media/right-button.png", 25, 25);
         nextImageButton.setOnAction(event -> {
-            clearZoom();
+            zoom.clearZoom();
             imageChanger.endSlideShow();
             imageChanger.nextImage(imageView);
         });
 
         slideShowButton.setOnAction(event -> {
-            clearZoom();
+            zoom.clearZoom();
             imageChanger.startSlideShow(imageView);
         });
 
-        /*URL _url = getClass().getResource("/media/left-button.png");
-        ImageView image = new ImageView(new Image(_url.toExternalForm()));
-        image.setFitWidth(20);
-        image.setFitHeight(18);
-        prevImageButton.setGraphic(image);
 
-        _url = getClass().getResource("/media/right-button.png");
-        image = new ImageView(new Image(_url.toExternalForm()));
-        image.setFitWidth(20);
-        image.setFitHeight(18);
-        prevImageButton.setGraphic(image);*/
+        setGraphic(zoomInButton, "/media/zoom-in.png", 20, 18);
+        zoomInButton.setOnAction(event -> {
+            zoom.zoomIn(1.8);
+        });
+
+        setGraphic(zoomOutButton,"/media/zoom-out.png", 20, 18);
+        zoomOutButton.setOnAction(event -> {
+            zoom.zoomOut(1.8);
+        });
     }
 
     private void loadPlugins() {
@@ -224,9 +201,12 @@ public class Home {
         return new ImageView(wr).getImage();
     }
 
-    public void clearZoom(){
-        imageView.setFitWidth(scrollPane.getWidth());
-        imageView.setFitHeight(scrollPane.getHeight());
+    private void setGraphic(Button button, String mediaPath,  int width, int height){
+        URL _url = getClass().getResource(mediaPath);
+        ImageView image = new ImageView(new Image(_url.toExternalForm()));
+        image.setFitWidth(width);
+        image.setFitHeight(height);
+        button.setGraphic(image);
     }
 
     public ImageView getImageView() {
