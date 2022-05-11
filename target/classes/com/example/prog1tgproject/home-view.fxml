@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
    <children>
       <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
         <items>
@@ -17,9 +21,11 @@
                 <MenuItem mnemonicParsing="false" text="Action 2" />
               </items>
             </MenuButton>
-          <Button mnemonicParsing="false" text="+" />
+          <Button mnemonicParsing="false" text="+ Albumhoz hozzáadás" />
             <Button fx:id="slideShowButton" mnemonicParsing="false" text="Lejátszás" />
             <Button mnemonicParsing="false" text="Rajz" />
+            <Button fx:id="zoomInButton" mnemonicParsing="false" />
+            <Button fx:id="zoomOutButton" mnemonicParsing="false" />
         </items>
       </ToolBar>
       <HBox prefHeight="100.0" prefWidth="200.0" />
@@ -27,18 +33,26 @@
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="prevImageButton" mnemonicParsing="false" text="&lt;-" />
+                  <Button fx:id="prevImageButton" mnemonicParsing="false" />
                </children>
             </HBox>
-            <ImageView fx:id="imageView" fitHeight="471.0" fitWidth="510.0" pickOnBounds="true" preserveRatio="true">
-               <HBox.margin>
-                  <Insets left="40.0" right="40.0" />
-               </HBox.margin>
-               <image>
-               </image></ImageView>
+             <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" pannable="true" prefHeight="471.0" prefWidth="510.0">
+               <content>
+                   <VBox alignment="CENTER">
+                       <HBox alignment="CENTER">
+                           <VBox fx:id="menuView">
+                               <children>
+                                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+                               </children>
+                           </VBox>
+                       </HBox>
+                   </VBox>
+
+               </content>
+             </ScrollPane>
             <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="nextImageButton" mnemonicParsing="false" text="-&gt;" />
+                  <Button fx:id="nextImageButton" mnemonicParsing="false" />
                </children>
             </HBox>
          </children>

@@ -1,16 +1,24 @@
 package com.example.prog1tgproject;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
@@ -34,23 +42,24 @@ public class Home {
     private MenuButton opButton;
 
     @FXML
-    private Button prevImageButton;
+    private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
 
     @FXML
-    private Button nextImageButton;
-
-    @FXML
-    private Button slideShowButton;
+    private ScrollPane scrollPane;
 
     File currentFile;
     ImageChanger imageChanger;
     BufferedImage img;
     
 
+    Zoom zoom;
+
     @FXML
     private void initialize() {
 
         loadPlugins();
+
+        zoom = new Zoom(imageView,scrollPane);
 
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
@@ -74,8 +83,10 @@ public class Home {
                 if (file != null) {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
+                    zoom.clearZoom();
                     imageView.setImage(new Image(imageChanger.getCurrentImage().getAbsolutePath()));
                     setBufferedImage(imageChanger.getCurrentImage());
+
                 }
             }
         });
@@ -95,14 +106,17 @@ public class Home {
             public void handle(ActionEvent actionEvent) {
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
-                    BufferedImage bufferedImage = null;
                     try {
-                        bufferedImage = ImageIO.read(currentFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        ImageIO.write(bufferedImage, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        boolean isSaved = ImageIO.write(img, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        if(!isSaved){
+                            BufferedImage image = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
+                            for (int y = 0; y < img.getHeight(); y++) {
+                                for (int x = 0; x < img.getWidth(); x++) {
+                                    image.setRGB(x,y,img.getRGB(x,y));
+                                }
+                            }
+                            ImageIO.write(image, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -110,24 +124,38 @@ public class Home {
             }
         });
 
+        setGraphic(prevImageButton, "/media/left-button.png", 25, 25);
         prevImageButton.setOnAction(event -> {
+            zoom.clearZoom();
             imageChanger.endSlideShow();
             imageChanger.previousImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
         });
 
+        setGraphic(nextImageButton, "/media/right-button.png", 25, 25);
         nextImageButton.setOnAction(event -> {
+            zoom.clearZoom();
             imageChanger.endSlideShow();
             imageChanger.nextImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
         });
 
         slideShowButton.setOnAction(event -> {
+            zoom.clearZoom();
             imageChanger.startSlideShow(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
         });
 
 
+        setGraphic(zoomInButton, "/media/zoom-in.png", 20, 18);
+        zoomInButton.setOnAction(event -> {
+            zoom.zoomIn(1.8);
+        });
+
+        setGraphic(zoomOutButton,"/media/zoom-out.png", 20, 18);
+        zoomOutButton.setOnAction(event -> {
+            zoom.zoomOut(1.8);
+        });
     }
 
     private void setBufferedImage(File currentImage) {
@@ -139,40 +167,26 @@ public class Home {
     }
 
     private void loadPlugins() {
-        ArrayList<Plugin> plugins = null;
+        ArrayList<Plugin> plugins;
         try {
             plugins = new PluginLoader().getPlugins();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        for (Plugin plugin : plugins) {
 
-            String[] paths = plugin.getImagePaths();
-            for (int i = 0; i < paths.length; i++) {
-                Button button = new Button();
-                URL _url = getClass().getResource(paths[i]);
-                ImageView image = new ImageView(new Image(_url.toExternalForm()));
-                image.setFitWidth(20);
-                image.setFitHeight(18);
-                button.setGraphic(image);
 
-                int finalI = i;
-                button.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        imageChanger.endSlideShow();
+            for (Plugin plugin : plugins) {
+                String[] paths = plugin.getImagePaths();
+                for (int i = 0; i < paths.length; i++) {
+                    Button button = new Button();
+                    setGraphic(button,paths[i], 20, 18);
+                    int finalI = i;
+                    button.setOnAction(event -> {
                         img = plugin.process(imageView, img, finalI);
                         imageView.setImage(convertToFxImage(img));
-                    }
-                });
-                toolBar.getItems().add(button);
+                    });
+                    toolBar.getItems().add(button);
+                }
             }
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 
@@ -190,19 +204,12 @@ public class Home {
         return new ImageView(wr).getImage();
     }
 
-    public static BufferedImage toBufferedImage(Image img) {
-
-
-        // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage((int) img.getWidth(), (int) img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        // Draw the image on to the buffered image
-        Graphics2D bGr = bimage.createGraphics();
-        //bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        // Return the buffered image
-        return bimage;
+    private void setGraphic(Button button, String mediaPath,  int width, int height){
+        URL _url = getClass().getResource(mediaPath);
+        ImageView image = new ImageView(new Image(_url.toExternalForm()));
+        image.setFitWidth(width);
+        image.setFitHeight(height);
+        button.setGraphic(image);
     }
 
     public ImageView getImageView() {

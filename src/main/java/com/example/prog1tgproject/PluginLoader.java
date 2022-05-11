@@ -1,5 +1,8 @@
 package com.example.prog1tgproject;
 
+import javafx.scene.control.Button;
+
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
