@@ -160,7 +160,9 @@ public class Home {
 
     private void setBufferedImage(File currentImage) {
         try {
-            img = ImageIO.read(currentImage);
+            if(currentImage != null) {
+                img = ImageIO.read(currentImage);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
