@@ -37,6 +37,7 @@ public class Album {
     }
 
     public void setPath(String path) {
+        images.clear();
         this.loadImages(path);
         this.path = path;
     }

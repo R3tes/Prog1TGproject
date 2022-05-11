@@ -150,12 +150,14 @@ public class Home {
         setGraphic(zoomInButton, "/media/zoom-in.png", 20, 18);
         zoomInButton.setOnAction(event -> {
             imageChanger.endSlideShow();
+            setBufferedImage(imageChanger.getCurrentImage());
             zoom.zoomIn(1.8);
         });
 
         setGraphic(zoomOutButton,"/media/zoom-out.png", 20, 18);
         zoomOutButton.setOnAction(event -> {
             imageChanger.endSlideShow();
+            setBufferedImage(imageChanger.getCurrentImage());
             zoom.zoomOut(1.8);
         });
     }
@@ -183,6 +185,9 @@ public class Home {
                     setGraphic(button,paths[i], 20, 18);
                     int finalI = i;
                     button.setOnAction(event -> {
+                        if(ImageChanger.timer != null){
+                            setBufferedImage(imageChanger.getCurrentImage());
+                        }
                         imageChanger.endSlideShow();
                         img = plugin.process(imageView, img, finalI);
                         imageView.setImage(convertToFxImage(img));
