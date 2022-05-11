@@ -17,7 +17,7 @@
                 <MenuItem mnemonicParsing="false" text="Action 2" />
               </items>
             </MenuButton>
-          <Button mnemonicParsing="false" text="+" />
+          <Button mnemonicParsing="false" text="+ Albumhoz hozzáadás" />
             <Button fx:id="slideShowButton" mnemonicParsing="false" text="Lejátszás" />
             <Button mnemonicParsing="false" text="Rajz" />
         </items>

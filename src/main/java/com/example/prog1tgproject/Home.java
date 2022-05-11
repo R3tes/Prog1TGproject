@@ -14,6 +14,7 @@ import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -44,6 +45,7 @@ public class Home {
     File currentFile;
     ImageChanger imageChanger;
     BufferedImage img;
+    
 
     @FXML
     private void initialize() {
@@ -72,8 +74,8 @@ public class Home {
                 if (file != null) {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
-                    imageView.setImage(imageChanger.getCurrentImage());
-                    img = toBufferedImage(imageView.getImage());
+                    imageView.setImage(new Image(imageChanger.getCurrentImage().getAbsolutePath()));
+                    setBufferedImage(imageChanger.getCurrentImage());
                 }
             }
         });
@@ -111,18 +113,29 @@ public class Home {
         prevImageButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             imageChanger.previousImage(imageView);
+            setBufferedImage(imageChanger.getCurrentImage());
         });
 
         nextImageButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             imageChanger.nextImage(imageView);
+            setBufferedImage(imageChanger.getCurrentImage());
         });
 
         slideShowButton.setOnAction(event -> {
             imageChanger.startSlideShow(imageView);
+            setBufferedImage(imageChanger.getCurrentImage());
         });
 
 
+    }
+
+    private void setBufferedImage(File currentImage) {
+        try {
+            img = ImageIO.read(currentImage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadPlugins() {
@@ -153,7 +166,9 @@ public class Home {
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        plugin.process(imageView, img, finalI);
+                        imageChanger.endSlideShow();
+                        img = plugin.process(imageView, img, finalI);
+                        imageView.setImage(convertToFxImage(img));
                     }
                 });
                 toolBar.getItems().add(button);

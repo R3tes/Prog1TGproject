@@ -1,6 +1,8 @@
 package com.example.prog1tgproject;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -10,7 +12,7 @@ import javafx.scene.image.ImageView;
 public class ImageChanger{
 
     private Album album;
-    private Image currentImage;
+    private File currentImage;
     private int currentImageIndex;
     public static Timer timer;
 
@@ -28,14 +30,14 @@ public class ImageChanger{
         this.album = album;
     }
 
-    public Image getCurrentImage() {
+    public File getCurrentImage() {
         return currentImage;
     }
 
     public void setCurrentImage(String currentImagePath) {
         for(int i = 0; i < album.getImages().size(); i++){
-            Image image = album.getImages().get(i);
-            if(image.getUrl().equals(currentImagePath)){
+            File image = album.getImages().get(i);
+            if(image.getAbsolutePath().equals(currentImagePath)){
                 currentImage = image;
                 currentImageIndex = i;
                 break;
@@ -53,7 +55,7 @@ public class ImageChanger{
         }
         currentImage = album.getImages().get(currentImageIndex);
         if(currentImage != null){
-            imageView.setImage(currentImage);
+            imageView.setImage(new Image(currentImage.getAbsolutePath()));
             return true;
         }
         return false;
@@ -69,7 +71,7 @@ public class ImageChanger{
         }
         currentImage = album.getImages().get(currentImageIndex);
         if(currentImage != null){
-            imageView.setImage(currentImage);
+            imageView.setImage(new Image(currentImage.getAbsolutePath()));
             return true;
         }
         return false;

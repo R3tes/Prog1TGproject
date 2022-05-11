@@ -14,7 +14,7 @@ import javafx.scene.image.Image;
 
 public class Album {
 
-    private ArrayList<Image> images;
+    private ArrayList<File> images;
     private String path;
     private final String[] validExtensions = {".png", ".jpg", ".jpeg", ".gif"};
 
@@ -24,11 +24,11 @@ public class Album {
         images = new ArrayList<>();
     }
 
-    public ArrayList<Image> getImages() {
+    public ArrayList<File> getImages() {
         return images;
     }
 
-    public void setImages(ArrayList<Image> images) {
+    public void setImages(ArrayList<File> images) {
         this.images = images;
     }
 
@@ -41,7 +41,7 @@ public class Album {
         this.path = path;
     }
 
-    public boolean addToAlbum(Image image){
+    public boolean addToAlbum(File image){
         if(!images.contains(image)){
             images.add(image);
             return true;
@@ -63,7 +63,7 @@ public class Album {
         }
         if(result != null) {
             for (String imagePath : result) {
-                Image image = new Image(imagePath);
+                File image = new File(imagePath);
                 addToAlbum(image);
             }
         }
