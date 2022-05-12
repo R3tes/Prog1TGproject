@@ -5,14 +5,15 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -30,6 +31,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class Home {
     @FXML
@@ -39,7 +42,10 @@ public class Home {
     private ToolBar toolBar;
 
     @FXML
-    private MenuButton opButton;
+    private MenuButton opButton, addToAlbumButton;
+
+    @FXML
+    private MenuItem createNewAlbum;
 
     @FXML
     private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
@@ -50,7 +56,7 @@ public class Home {
     File currentFile;
     ImageChanger imageChanger;
     BufferedImage img;
-    
+    AlbumManager albumManager;
 
     Zoom zoom;
 
@@ -58,6 +64,7 @@ public class Home {
     private void initialize() {
 
         loadPlugins();
+
 
         zoom = new Zoom(imageView,scrollPane);
 
@@ -75,14 +82,44 @@ public class Home {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("src/main/resources/AppPictures"));
         imageChanger = new ImageChanger(new Album("src/main/resources/AppPictures"));
+        albumManager = new AlbumManager("src/main/resources/AppPictures/Album");
+        loadAlbums();
+
+        createNewAlbum.setOnAction(event -> {
+            TextInputDialog newAlbumPopup = new TextInputDialog();
+            newAlbumPopup.setTitle("Új album");
+            newAlbumPopup.setHeaderText("Mi legyen az album neve?");
+            Optional<String> result = newAlbumPopup.showAndWait();
+            if(result.isPresent() && !newAlbumPopup.getResult().trim().equals("")){
+                String albumName = newAlbumPopup.getResult();
+                File newAlbum = new File("src/main/resources/AppPictures/Album/" + albumName);
+                if (!newAlbum.exists()) {
+                    if (imageChanger.getCurrentImage() != null && newAlbum.mkdirs()) {
+                        String extension = imageChanger.getCurrentImage().getAbsolutePath()
+                                .substring(imageChanger.getCurrentImage().getAbsolutePath().length() - 3);
+                        File targetDirectory = new File(newAlbum.getAbsolutePath() + "/" + imageChanger.getCurrentImage().getName());
+                        saveImage(extension, targetDirectory);
+                    }
+                    loadAlbums();
+                }else{
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Hiba");
+                    alert.setHeaderText("Ilyen nevű album már létezik!");
+                    alert.showAndWait();
+                }
+            }
+
+        });
 
         open.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                imageChanger.endSlideShow();
                 File file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
                 if (file != null) {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
+
                     zoom.clearZoom();
                     imageView.setImage(new Image(imageChanger.getCurrentImage().getAbsolutePath()));
                     setBufferedImage(imageChanger.getCurrentImage());
@@ -94,7 +131,9 @@ public class Home {
         delete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                currentFile.delete();
+                imageChanger.endSlideShow();
+                imageChanger.getAlbum().getImages().remove(imageChanger.getCurrentImage());
+                imageChanger.getCurrentImage().delete();
                 imageView.setImage(null);
             }
         });
@@ -104,22 +143,11 @@ public class Home {
         savAs.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                imageChanger.endSlideShow();
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
-                    try {
-                        boolean isSaved = ImageIO.write(img, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
-                        if(!isSaved){
-                            BufferedImage image = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
-                            for (int y = 0; y < img.getHeight(); y++) {
-                                for (int x = 0; x < img.getWidth(); x++) {
-                                    image.setRGB(x,y,img.getRGB(x,y));
-                                }
-                            }
-                            ImageIO.write(image, dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3), dir);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    String extension = dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3);
+                    saveImage(extension, dir);
                 }
             }
         });
@@ -159,6 +187,10 @@ public class Home {
             imageChanger.endSlideShow();
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.zoomOut(1.8);
+        });
+
+        addToAlbumButton.setOnAction(event -> {
+
         });
     }
 
@@ -220,6 +252,47 @@ public class Home {
         image.setFitWidth(width);
         image.setFitHeight(height);
         button.setGraphic(image);
+    }
+
+    public void saveImage(String extension, File targetDirectory){
+        try {
+            boolean isSaved = ImageIO.write(img, extension, targetDirectory);
+            if(!isSaved){
+                BufferedImage image = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
+                for (int y = 0; y < img.getHeight(); y++) {
+                    for (int x = 0; x < img.getWidth(); x++) {
+                        image.setRGB(x,y,img.getRGB(x,y));
+                    }
+                }
+                ImageIO.write(image, extension, targetDirectory);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadAlbums(){
+        albumManager.loadAlbums();
+        for(Album album : albumManager.getAlbums()) {
+            String[] splitPath;
+            splitPath = album.getPath().replace('\\', '/').split(Pattern.quote("/"));
+            boolean exits = false;
+            for(MenuItem item : addToAlbumButton.getItems()){
+                if(item.getText().equals(splitPath[splitPath.length - 1])){
+                    exits = true;
+                }
+            }
+            if(!exits) {
+                MenuItem albumButton = new MenuItem(splitPath[splitPath.length - 1]);
+                albumButton.setOnAction(event -> {
+                    String extension = imageChanger.getCurrentImage().getAbsolutePath()
+                            .substring(imageChanger.getCurrentImage().getAbsolutePath().length() - 3);
+                    File targetDirectory = new File(album.getPath().replace('\\', '/') + "/" + imageChanger.getCurrentImage().getName());
+                    saveImage(extension, targetDirectory);
+                });
+                addToAlbumButton.getItems().add(albumButton);
+            }
+        }
     }
 
     public ImageView getImageView() {
