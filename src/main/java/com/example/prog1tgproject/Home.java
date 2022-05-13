@@ -1,30 +1,20 @@
 package com.example.prog1tgproject;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
-
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +41,10 @@ public class Home {
     private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
 
     @FXML
-    private ScrollPane scrollPane;
+    private HBox root;
+
+    @FXML
+    private StackPane container;
 
     File currentFile;
     ImageChanger imageChanger;
@@ -65,8 +58,14 @@ public class Home {
 
         loadPlugins();
 
+        zoom = new Zoom(imageView);
 
-        zoom = new Zoom(imageView,scrollPane);
+        container.setPrefSize(700, 500);
+        imageView.fitWidthProperty().bind(container.widthProperty());
+        imageView.fitHeightProperty().bind(container.heightProperty());
+        container.setAlignment(imageView, Pos.CENTER);
+        root.setFillHeight(true);
+        HBox.setHgrow(container, Priority.ALWAYS);
 
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
@@ -120,10 +119,10 @@ public class Home {
                     imageChanger.getAlbum().setPath(file.getParent());
                     imageChanger.setCurrentImage(file.getAbsolutePath());
 
-                    zoom.clearZoom();
                     imageView.setImage(new Image(imageChanger.getCurrentImage().getAbsolutePath()));
                     setBufferedImage(imageChanger.getCurrentImage());
-
+                    Rectangle2D viewport = imageView.getViewport();
+                    zoom.refresh(imageView);
                 }
             }
         });
@@ -154,24 +153,24 @@ public class Home {
 
         setGraphic(prevImageButton, "/media/left-button.png", 25, 25);
         prevImageButton.setOnAction(event -> {
-            zoom.clearZoom();
             imageChanger.endSlideShow();
             imageChanger.previousImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
+            zoom.refresh(imageView);
         });
 
         setGraphic(nextImageButton, "/media/right-button.png", 25, 25);
         nextImageButton.setOnAction(event -> {
-            zoom.clearZoom();
             imageChanger.endSlideShow();
             imageChanger.nextImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
+            zoom.refresh(imageView);
         });
 
         slideShowButton.setOnAction(event -> {
-            zoom.clearZoom();
             imageChanger.startSlideShow(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
+            zoom.refresh(imageView);
         });
 
 
@@ -179,14 +178,14 @@ public class Home {
         zoomInButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             setBufferedImage(imageChanger.getCurrentImage());
-            zoom.zoomIn(1.8);
+            zoom.setZoom(34,imageView.getImage().getWidth()/2, imageView.getImage().getHeight()/2);
         });
 
         setGraphic(zoomOutButton,"/media/zoom-out.png", 20, 18);
         zoomOutButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             setBufferedImage(imageChanger.getCurrentImage());
-            zoom.zoomOut(1.8);
+            zoom.setZoom(-34,imageView.getImage().getWidth()/2, imageView.getImage().getHeight()/2);
         });
 
         addToAlbumButton.setOnAction(event -> {
@@ -223,6 +222,7 @@ public class Home {
                         imageChanger.endSlideShow();
                         img = plugin.process(imageView, img, finalI);
                         imageView.setImage(convertToFxImage(img));
+                        zoom.refresh(imageView);
                     });
                     toolBar.getItems().add(button);
                 }
@@ -293,9 +293,5 @@ public class Home {
                 addToAlbumButton.getItems().add(albumButton);
             }
         }
-    }
-
-    public ImageView getImageView() {
-        return imageView;
     }
 }
