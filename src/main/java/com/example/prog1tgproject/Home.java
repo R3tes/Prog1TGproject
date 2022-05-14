@@ -6,14 +6,16 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -35,7 +37,7 @@ public class Home {
     private MenuButton opButton, addToAlbumButton;
 
     @FXML
-    private MenuItem createNewAlbum;
+    private MenuItem createNewAlbum, invertImageButton, grayscaleImageButton;
 
     @FXML
     private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
@@ -89,7 +91,7 @@ public class Home {
             newAlbumPopup.setTitle("Új album");
             newAlbumPopup.setHeaderText("Mi legyen az album neve?");
             Optional<String> result = newAlbumPopup.showAndWait();
-            if(result.isPresent() && !newAlbumPopup.getResult().trim().equals("")){
+            if (result.isPresent() && !newAlbumPopup.getResult().trim().equals("")) {
                 String albumName = newAlbumPopup.getResult();
                 File newAlbum = new File("src/main/resources/AppPictures/Album/" + albumName);
                 if (!newAlbum.exists()) {
@@ -100,7 +102,7 @@ public class Home {
                         saveImage(extension, targetDirectory);
                     }
                     loadAlbums();
-                }else{
+                } else {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Hiba");
                     alert.setHeaderText("Ilyen nevű album már létezik!");
@@ -151,7 +153,7 @@ public class Home {
             }
         });
 
-        setGraphic(prevImageButton, "/media/left-button.png", 25, 25);
+        setGraphic(prevImageButton, "/media/left-button.png", 43, 43);
         prevImageButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             imageChanger.previousImage(imageView);
@@ -159,12 +161,27 @@ public class Home {
             zoom.refresh(imageView);
         });
 
-        setGraphic(nextImageButton, "/media/right-button.png", 25, 25);
+        setGraphic(nextImageButton, "/media/right-button.png", 43, 43);
         nextImageButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             imageChanger.nextImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
+        });
+
+        opButton.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.LEFT) {
+                imageChanger.endSlideShow();
+                imageChanger.previousImage(imageView);
+                setBufferedImage(imageChanger.getCurrentImage());
+                zoom.refresh(imageView);
+            }
+            if (keyEvent.getCode() == KeyCode.RIGHT) {
+                imageChanger.endSlideShow();
+                imageChanger.nextImage(imageView);
+                setBufferedImage(imageChanger.getCurrentImage());
+                zoom.refresh(imageView);
+            }
         });
 
         slideShowButton.setOnAction(event -> {
@@ -173,19 +190,18 @@ public class Home {
             zoom.refresh(imageView);
         });
 
-
         setGraphic(zoomInButton, "/media/zoom-in.png", 20, 18);
         zoomInButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             setBufferedImage(imageChanger.getCurrentImage());
-            zoom.setZoom(34,imageView.getImage().getWidth()/2, imageView.getImage().getHeight()/2);
+            zoom.setZoom(34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
         });
 
-        setGraphic(zoomOutButton,"/media/zoom-out.png", 20, 18);
+        setGraphic(zoomOutButton, "/media/zoom-out.png", 20, 18);
         zoomOutButton.setOnAction(event -> {
             imageChanger.endSlideShow();
             setBufferedImage(imageChanger.getCurrentImage());
-            zoom.setZoom(-34,imageView.getImage().getWidth()/2, imageView.getImage().getHeight()/2);
+            zoom.setZoom(-34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
         });
 
         addToAlbumButton.setOnAction(event -> {
@@ -195,7 +211,7 @@ public class Home {
 
     private void setBufferedImage(File currentImage) {
         try {
-            if(currentImage != null) {
+            if (currentImage != null) {
                 img = ImageIO.read(currentImage);
             }
         } catch (IOException e) {
@@ -208,15 +224,14 @@ public class Home {
         try {
             plugins = new PluginLoader().getPlugins();
 
-
             for (Plugin plugin : plugins) {
                 String[] paths = plugin.getImagePaths();
                 for (int i = 0; i < paths.length; i++) {
                     Button button = new Button();
-                    setGraphic(button,paths[i], 20, 18);
+                    setGraphic(button, paths[i], 20, 18);
                     int finalI = i;
                     button.setOnAction(event -> {
-                        if(ImageChanger.timer != null){
+                        if (ImageChanger.timer != null) {
                             setBufferedImage(imageChanger.getCurrentImage());
                         }
                         imageChanger.endSlideShow();
@@ -246,7 +261,7 @@ public class Home {
         return new ImageView(wr).getImage();
     }
 
-    private void setGraphic(Button button, String mediaPath,  int width, int height){
+    private void setGraphic(Button button, String mediaPath, int width, int height) {
         URL _url = getClass().getResource(mediaPath);
         ImageView image = new ImageView(new Image(_url.toExternalForm()));
         image.setFitWidth(width);
@@ -254,14 +269,14 @@ public class Home {
         button.setGraphic(image);
     }
 
-    public void saveImage(String extension, File targetDirectory){
+    public void saveImage(String extension, File targetDirectory) {
         try {
             boolean isSaved = ImageIO.write(img, extension, targetDirectory);
-            if(!isSaved){
-                BufferedImage image = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
+            if (!isSaved) {
+                BufferedImage image = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
                 for (int y = 0; y < img.getHeight(); y++) {
                     for (int x = 0; x < img.getWidth(); x++) {
-                        image.setRGB(x,y,img.getRGB(x,y));
+                        image.setRGB(x, y, img.getRGB(x, y));
                     }
                 }
                 ImageIO.write(image, extension, targetDirectory);
@@ -271,18 +286,18 @@ public class Home {
         }
     }
 
-    public void loadAlbums(){
+    public void loadAlbums() {
         albumManager.loadAlbums();
-        for(Album album : albumManager.getAlbums()) {
+        for (Album album : albumManager.getAlbums()) {
             String[] splitPath;
             splitPath = album.getPath().replace('\\', '/').split(Pattern.quote("/"));
             boolean exits = false;
-            for(MenuItem item : addToAlbumButton.getItems()){
-                if(item.getText().equals(splitPath[splitPath.length - 1])){
+            for (MenuItem item : addToAlbumButton.getItems()) {
+                if (item.getText().equals(splitPath[splitPath.length - 1])) {
                     exits = true;
                 }
             }
-            if(!exits) {
+            if (!exits) {
                 MenuItem albumButton = new MenuItem(splitPath[splitPath.length - 1]);
                 albumButton.setOnAction(event -> {
                     String extension = imageChanger.getCurrentImage().getAbsolutePath()
