@@ -12,6 +12,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
@@ -61,8 +62,6 @@ public class Home {
         loadPlugins();
 
         zoom = new Zoom(imageView);
-
-        container.setPrefSize(700, 500);
         imageView.fitWidthProperty().bind(container.widthProperty());
         imageView.fitHeightProperty().bind(container.heightProperty());
         container.setAlignment(imageView, Pos.CENTER);
