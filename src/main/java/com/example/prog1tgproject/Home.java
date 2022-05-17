@@ -203,9 +203,7 @@ public class Home {
             zoom.setZoom(-34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
         });
 
-        addToAlbumButton.setOnAction(event -> {
 
-        });
     }
 
     private void setBufferedImage(File currentImage) {
@@ -297,15 +295,76 @@ public class Home {
                 }
             }
             if (!exits) {
-                MenuItem albumButton = new MenuItem(splitPath[splitPath.length - 1]);
-                albumButton.setOnAction(event -> {
+                Menu albumButton = new Menu(splitPath[splitPath.length - 1]);
+                MenuItem addPhoto  = new MenuItem("Kép hozzáadása");
+                addPhoto.setOnAction(event -> {
                     String extension = imageChanger.getCurrentImage().getAbsolutePath()
                             .substring(imageChanger.getCurrentImage().getAbsolutePath().length() - 3);
                     File targetDirectory = new File(album.getPath().replace('\\', '/') + "/" + imageChanger.getCurrentImage().getName());
                     saveImage(extension, targetDirectory);
                 });
+
+                MenuItem renameAlbum  = new MenuItem("Átnevezés");
+                renameAlbum.setOnAction(event -> {
+                    TextInputDialog newAlbumPopup = new TextInputDialog();
+                    newAlbumPopup.setTitle("Átnevezés");
+                    newAlbumPopup.setHeaderText("Mi legyen az album új neve?");
+                    Optional<String> result = newAlbumPopup.showAndWait();
+                    if (result.isPresent() && !newAlbumPopup.getResult().trim().equals("")) {
+                        String albumName = newAlbumPopup.getResult();
+                        File newAlbum = new File("src/main/resources/AppPictures/Album/" + albumName);
+                        File oldAlbum = new File(album.getPath().replace('\\', '/'));
+                        if(oldAlbum.renameTo(newAlbum)){
+                            albumButton.setText(albumName);
+                            album.setPath("src/main/resources/AppPictures/Album/" + albumName);
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("Üzenet");
+                            alert.setHeaderText("Az albumot sikeresen átnevezted!");
+                            alert.showAndWait();
+                        }else{
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Hiba");
+                            alert.setHeaderText("Hiba történt az album átnevezése során!");
+                            alert.showAndWait();
+                        }
+                    }
+                });
+
+                MenuItem deleteAlbum  = new MenuItem("Törlés");
+                deleteAlbum.setOnAction(event -> {
+                    File albumToDelete = new File(album.getPath().replace('\\', '/'));
+                    if(deleteFolder(albumToDelete)){
+                        addToAlbumButton.getItems().remove(albumButton);
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Üzenet");
+                        alert.setHeaderText("Az albumot sikeresen törölted!");
+                        alert.showAndWait();
+
+                    }else{
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Hiba");
+                        alert.setHeaderText("Hiba történt az album törlése során!");
+                        alert.showAndWait();
+                    }
+
+                });
+                albumButton.getItems().addAll(addPhoto, renameAlbum, deleteAlbum);
                 addToAlbumButton.getItems().add(albumButton);
             }
         }
+    }
+
+    private boolean deleteFolder(File folder){
+        File[] files = folder.listFiles();
+        if(files != null && files.length > 0){
+            for(File file : files){
+                if(!file.isDirectory()){
+                    file.delete();
+                }else{
+                    deleteFolder(file);
+                }
+            }
+        }
+        return folder.delete();
     }
 }
