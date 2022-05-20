@@ -39,12 +39,12 @@
 }
 
 #root {
-    -fx-border-color: green;
+    -fx-border-color: #f4f4f4;
 }
 
-#container {
+/*#container {
     -fx-background-color: red
-}
+}*/
 
 /* #nextImageButton:pressed {
     -fx-background-color: #ff0000;

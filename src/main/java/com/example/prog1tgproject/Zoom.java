@@ -28,8 +28,7 @@ public class Zoom {
         this.imageView = imageView;
         image = imageView.getImage();
         prevZooms.clear();
-        prevZooms.add(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
-        imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
+        imageView.setViewport(null);
         init();
     }
 
@@ -70,76 +69,83 @@ public class Zoom {
     }
 
     public void setZoom(double delta, double x, double y){
-        double height = 0;
-        double width = 0;
         try {
-            height = image.getHeight();
-            width = image.getWidth();
+            double height = 0;
+            double width = 0;
+            try {
+                height = image.getHeight();
+                width = image.getWidth();
 
+            }catch (Exception e){}
+            double finalWidth = width;
+            double finalHeight = height;
+
+            Rectangle2D viewport = imageView.getViewport();
+            if(viewport == null){
+                prevZooms.add(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
+                imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
+            }
+            double scale = clamp(Math.pow(1.005, delta*(-1)),
+                    Math.min(MIN_PIXELS / viewport.getWidth(), MIN_PIXELS / viewport.getHeight()),
+                    Math.max(finalWidth / viewport.getWidth(), finalHeight / viewport.getHeight())
+            );
+            Point2D mouse = imageViewToImage(new Point2D(x, y));
+
+            double newWidth = viewport.getWidth();
+            double newHeight = viewport.getHeight();
+            double imageViewRatio = (imageView.getFitWidth() / imageView.getFitHeight());
+            //System.out.println("FitWidth: " + imageView.getFitWidth());
+            //System.out.println("FitHeight: " + imageView.getFitHeight());
+            double viewportRatio = (newWidth / newHeight);
+            if (viewportRatio < imageViewRatio) {
+                newHeight = newHeight * scale;
+                newWidth = newHeight * imageViewRatio;
+                if (newWidth > image.getWidth()) {
+                    newWidth = image.getWidth();
+                }
+                /*System.out.println("WIDTH TO HEIGHT");
+                System.out.println(imageViewRatio);
+                System.out.println(viewportRatio);
+                System.out.println(newHeight);
+                System.out.println(" ");*/
+            } else {
+                newWidth = newWidth * scale;
+                newHeight = newWidth / imageViewRatio;
+                if (newHeight > image.getHeight()) {
+                    newHeight = image.getHeight();
+                }
+                /*System.out.println("HEIGHT TO WIDTH");
+                System.out.println(imageViewRatio);
+                System.out.println(viewportRatio);
+                System.out.println(newHeight);
+                System.out.println(" ");*/
+            }
+
+            double newMinX = 0;
+            if (newWidth < image.getWidth()) {
+                newMinX = clamp(mouse.getX() - (mouse.getX() - viewport.getMinX()) * scale,
+                        0, finalWidth - newWidth);
+            }
+            double newMinY = 0;
+            if (newHeight < image.getHeight()) {
+                newMinY = clamp(mouse.getY() - (mouse.getY() - viewport.getMinY()) * scale,
+                        0, finalHeight - newHeight);
+            }
+
+            if(delta >= 0){
+                if (scale != 1.0) {
+                    imageView.setViewport(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
+                    prevZooms.add(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
+                }
+            }else{
+                if(prevZooms.size() > 1){
+                    Rectangle2D zoom = prevZooms.get(prevZooms.size()-2);
+                    imageView.setViewport(new Rectangle2D(newMinX, newMinY, zoom.getWidth(), zoom.getHeight()));
+                    prevZooms.remove(prevZooms.get(prevZooms.size()-1));
+                }
+            }
         }catch (Exception e){}
-        double finalWidth = width;
-        double finalHeight = height;
 
-        Rectangle2D viewport = imageView.getViewport();
-        double scale = clamp(Math.pow(1.005, delta*(-1)),
-                Math.min(MIN_PIXELS / viewport.getWidth(), MIN_PIXELS / viewport.getHeight()),
-                Math.max(finalWidth / viewport.getWidth(), finalHeight / viewport.getHeight())
-        );
-        Point2D mouse = imageViewToImage(new Point2D(x, y));
-
-        double newWidth = viewport.getWidth();
-        double newHeight = viewport.getHeight();
-        double imageViewRatio = (imageView.getFitWidth() / imageView.getFitHeight());
-        System.out.println("FitWidth: " + imageView.getFitWidth());
-        System.out.println("FitHeight: " + imageView.getFitHeight());
-        double viewportRatio = (newWidth / newHeight);
-        if (viewportRatio < imageViewRatio) {
-            newHeight = newHeight * scale;
-            newWidth = newHeight * imageViewRatio;
-            if (newWidth > image.getWidth()) {
-                newWidth = image.getWidth();
-            }
-            System.out.println("WIDTH TO HEIGHT");
-            System.out.println(imageViewRatio);
-            System.out.println(viewportRatio);
-            System.out.println(newHeight);
-            System.out.println(" ");
-        } else {
-            newWidth = newWidth * scale;
-            newHeight = newWidth / imageViewRatio;
-            if (newHeight > image.getHeight()) {
-                newHeight = image.getHeight();
-            }
-            System.out.println("HEIGHT TO WIDTH");
-            System.out.println(imageViewRatio);
-            System.out.println(viewportRatio);
-            System.out.println(newHeight);
-            System.out.println(" ");
-        }
-
-        double newMinX = 0;
-        if (newWidth < image.getWidth()) {
-            newMinX = clamp(mouse.getX() - (mouse.getX() - viewport.getMinX()) * scale,
-                    0, finalWidth - newWidth);
-        }
-        double newMinY = 0;
-        if (newHeight < image.getHeight()) {
-            newMinY = clamp(mouse.getY() - (mouse.getY() - viewport.getMinY()) * scale,
-                    0, finalHeight - newHeight);
-        }
-
-        if(delta >= 0){
-            if (scale != 1.0) {
-                imageView.setViewport(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
-                prevZooms.add(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
-            }
-        }else{
-            if(prevZooms.size() > 1){
-                Rectangle2D zoom = prevZooms.get(prevZooms.size()-2);
-                imageView.setViewport(new Rectangle2D(newMinX, newMinY, zoom.getWidth(), zoom.getHeight()));
-                prevZooms.remove(prevZooms.get(prevZooms.size()-1));
-            }
-        }
     }
 
     private void reset(double width, double height) {
@@ -179,6 +185,9 @@ public class Zoom {
         double yProportion = imageViewCoordinates.getY() / imageView.getBoundsInLocal().getHeight();
 
         Rectangle2D viewport = imageView.getViewport();
+        if(viewport == null){
+            viewport = new Rectangle2D(0,0,0,0);
+        }
         return new Point2D(
                 viewport.getMinX() + xProportion * viewport.getWidth(),
                 viewport.getMinY() + yProportion * viewport.getHeight());
