@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1024.0" stylesheets="/style.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1003.0" stylesheets="/style.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
    <children>
       <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
         <items>
@@ -28,13 +34,66 @@
               </items>
             </MenuButton>
             <Button fx:id="slideShowButton" mnemonicParsing="false" text="Lejátszás" />
-            <Button mnemonicParsing="false" text="Rajz" />
+            <ToggleButton fx:id="drawButton" mnemonicParsing="false" text="Rajz" />
             <Button fx:id="zoomInButton" mnemonicParsing="false" />
             <Button fx:id="zoomOutButton" mnemonicParsing="false" />
         </items>
       </ToolBar>
-      <HBox prefHeight="100.0" prefWidth="200.0" />
-      <HBox fx:id="root" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="1024.0">
+      <HBox fx:id="drawSlider" prefHeight="0.0" prefWidth="1024.0">
+         <children>
+            <ToggleButton fx:id="pencilDrawButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Ceruza">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="rubberDrawButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Radír">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="lineDrawButton" layoutX="120.0" layoutY="15.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Vonal">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="rectDrawButton" layoutX="226.0" layoutY="15.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Négyszög">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="circleDrawButton" layoutX="332.0" layoutY="15.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Kör">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <Label fx:id="colorpickerText" prefHeight="22.0" prefWidth="90.0" text="Szín választás:">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ColorPicker fx:id="colorDrawPicker" prefHeight="26.0" prefWidth="94.0">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </ColorPicker>
+            <Label fx:id="pencilstrText" prefHeight="22.0" prefWidth="114.0" text="Ceruza vastagság:">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+            <Slider fx:id="pencilstrDrawSlider" prefHeight="25.0" prefWidth="100.0">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="20.0" top="5.0" />
+               </HBox.margin>
+            </Slider>
+         </children></HBox>
+      <HBox fx:id="root" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="570.0" prefWidth="1024.0">
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                <children>
@@ -44,6 +103,7 @@
           <StackPane fx:id="container" alignment="CENTER">
               <children>
                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+                  <Canvas fx:id="canvasDraw" height="200.0" width="200.0" />
               </children>
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
