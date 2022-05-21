@@ -1,14 +1,10 @@
 package com.example.prog1tgproject;
 
-import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,19 +16,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToolBar;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -61,29 +44,10 @@ public class Home {
     private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
 
     @FXML
-    private HBox root, drawSlider;
+    private HBox root;
 
     @FXML
     private StackPane container;
-
-    @FXML
-    private ToggleButton drawButton;
-
-    @FXML
-    private Canvas canvasDraw;
-
-    @FXML
-    public ToggleButton pencilDrawButton,lineDrawButton,rectDrawButton,circleDrawButton,rubberDrawButton;
-
-    @FXML
-    public ColorPicker colorDrawPicker;
-
-    @FXML
-    public Slider pencilstrDrawSlider;
-
-    @FXML
-    private Label pencilstrText,colorpickerText;
-
 
     File currentFile;
     ImageChanger imageChanger;
@@ -91,26 +55,13 @@ public class Home {
     AlbumManager albumManager;
 
     Zoom zoom;
-    Draw draw;
 
     @FXML
-    private void initialize() throws IOException {
-
-
-        if(pencilDrawButton==null){
-            System.out.println("valami");
-        }
+    private void initialize() {
 
         loadPlugins();
 
         zoom = new Zoom(imageView);
-<<<<<<< HEAD
-        draw = new Draw(imageView, canvasDraw,pencilDrawButton,lineDrawButton,rectDrawButton,circleDrawButton,rubberDrawButton,
-                colorDrawPicker, pencilstrDrawSlider);
-
-        container.setPrefSize(700, 500);
-=======
->>>>>>> 712c479c22c10ced684f88a3437827ea61b68ae0
         imageView.fitWidthProperty().bind(container.widthProperty());
         imageView.fitHeightProperty().bind(container.heightProperty());
         container.setAlignment(imageView, Pos.CENTER);
@@ -173,8 +124,6 @@ public class Home {
                     setBufferedImage(imageChanger.getCurrentImage());
                     Rectangle2D viewport = imageView.getViewport();
                     zoom.refresh(imageView);
-
-                    draw.initializeDraw();
                 }
             }
         });
@@ -255,28 +204,6 @@ public class Home {
         });
 
 
-<<<<<<< HEAD
-        });
-
-        drawSlider.setVisible(false);
-        drawButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue){
-                drawSlider.setVisible(true);
-                //imageView.setVisible(false);
-                //canvasDraw.setVisible(true);
-            }else {
-                drawSlider.setVisible(false);
-                //imageView.setVisible(true);
-                //canvasDraw.setVisible(false);
-
-                Image img;
-                img=imageView.getImage();
-                canvasDraw.getGraphicsContext2D().drawImage(img,0,0);
-                imageView.setImage(img);
-            }
-        });
-=======
->>>>>>> 712c479c22c10ced684f88a3437827ea61b68ae0
     }
 
     private void setBufferedImage(File currentImage) {
