@@ -46,4 +46,5 @@ public class AlbumManager {
     public ArrayList<Album> getAlbums(){
         return albums;
     }
+
 }

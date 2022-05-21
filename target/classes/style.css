@@ -38,6 +38,14 @@
     -fx-border-width: 5;
 }
 
+#root {
+    -fx-border-color: #f4f4f4;
+}
+
+/*#container {
+    -fx-background-color: red
+}*/
+
 /* #nextImageButton:pressed {
     -fx-background-color: #ff0000;
     -fx-border-color: #eaeaea;

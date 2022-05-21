@@ -16,9 +16,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<<<<<<< HEAD
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1003.0" stylesheets="/style.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
+=======
+<VBox stylesheets="/style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
+>>>>>>> 712c479c22c10ced684f88a3437827ea61b68ae0
    <children>
-      <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
+      <ToolBar fx:id="toolBar">
         <items>
             <MenuButton fx:id="opButton" mnemonicParsing="false" text="...">
             </MenuButton>
@@ -39,6 +43,7 @@
             <Button fx:id="zoomOutButton" mnemonicParsing="false" />
         </items>
       </ToolBar>
+<<<<<<< HEAD
       <HBox fx:id="drawSlider" prefHeight="0.0" prefWidth="1024.0">
          <children>
             <ToggleButton fx:id="pencilDrawButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Ceruza">
@@ -94,13 +99,16 @@
             </Slider>
          </children></HBox>
       <HBox fx:id="root" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="570.0" prefWidth="1024.0">
+=======
+      <HBox fx:id="root" alignment="CENTER">
+>>>>>>> 712c479c22c10ced684f88a3437827ea61b68ae0
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0">
                <children>
                   <Button fx:id="prevImageButton" mnemonicParsing="false" />
                </children>
             </HBox>
-          <StackPane fx:id="container" alignment="CENTER">
+          <StackPane fx:id="container" alignment="CENTER" prefHeight="640.0">
               <children>
                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
                   <Canvas fx:id="canvasDraw" height="200.0" width="200.0" />
@@ -109,7 +117,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
           </StackPane>
-            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0">
                <children>
                   <Button fx:id="nextImageButton" mnemonicParsing="false" />
                </children>
