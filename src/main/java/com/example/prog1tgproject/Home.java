@@ -5,6 +5,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,10 +46,35 @@ public class Home {
     private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
 
     @FXML
-    private HBox root;
+    private HBox root, drawSlider;
 
     @FXML
     private StackPane container;
+
+    @FXML
+    private ToggleButton drawButton;
+
+    @FXML
+    private Canvas canvasDraw;
+
+    @FXML
+    public ToggleButton pencilDrawButton,lineDrawButton,rectDrawButton,circleDrawButton,rubberDrawButton,textDrawButton;
+
+    @FXML
+    public ColorPicker colorDrawPicker;
+
+    @FXML
+    public Slider pencilstrDrawSlider;
+
+    @FXML
+    private Label pencilstrText,colorpickerText;
+
+    @FXML
+    private TextField writeTextField;
+
+    @FXML
+    private Button undoDrawButton, saveDrawButton, redoDrawButton;
+    
 
     File currentFile;
     ImageChanger imageChanger;
@@ -55,13 +82,17 @@ public class Home {
     AlbumManager albumManager;
 
     Zoom zoom;
+    Draw draw;
 
     @FXML
     private void initialize() {
 
         loadPlugins();
+        drawSlider.setVisible(false);
 
         zoom = new Zoom(imageView);
+        draw = new Draw(imageView, canvasDraw,pencilDrawButton,lineDrawButton,rectDrawButton,circleDrawButton,rubberDrawButton,
+                colorDrawPicker, pencilstrDrawSlider, textDrawButton, undoDrawButton, redoDrawButton, saveDrawButton, writeTextField);
         imageView.fitWidthProperty().bind(container.widthProperty());
         imageView.fitHeightProperty().bind(container.heightProperty());
         container.setAlignment(imageView, Pos.CENTER);
@@ -124,6 +155,8 @@ public class Home {
                     setBufferedImage(imageChanger.getCurrentImage());
                     Rectangle2D viewport = imageView.getViewport();
                     zoom.refresh(imageView);
+
+                    draw.initializeDraw();
                 }
             }
         });
@@ -158,6 +191,8 @@ public class Home {
             imageChanger.previousImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
+
+            draw.initializeDraw();
         });
 
         setGraphic(nextImageButton, "/media/right-button.png", 43, 43);
@@ -166,6 +201,8 @@ public class Home {
             imageChanger.nextImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
+
+            draw.initializeDraw();
         });
 
         opButton.setOnKeyPressed(keyEvent -> {
@@ -204,6 +241,20 @@ public class Home {
         });
 
 
+        drawButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue){
+                drawSlider.setVisible(true);
+                //imageView.setVisible(false);
+                //canvasDraw.setVisible(true);
+            }else {
+                drawSlider.setVisible(false);
+
+                /*Image img;
+                img = imageView.getImage();
+                canvasDraw.getGraphicsContext2D().drawImage(img,0,0);
+                imageView.setImage(img);*/
+            }
+        });
     }
 
     private void setBufferedImage(File currentImage) {
@@ -226,6 +277,7 @@ public class Home {
                 for (int i = 0; i < paths.length; i++) {
                     Button button = new Button();
                     setGraphic(button, paths[i], 20, 18);
+                    button.setCursor(Cursor.HAND);
                     int finalI = i;
                     button.setOnAction(event -> {
                         if (ImageChanger.timer != null) {

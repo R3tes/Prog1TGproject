@@ -1,48 +1,195 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox stylesheets="/style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
+<VBox prefHeight="750.0" prefWidth="1140.0" stylesheets="/style.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.prog1tgproject.Home">
    <children>
       <ToolBar fx:id="toolBar">
         <items>
             <MenuButton fx:id="opButton" mnemonicParsing="false" text="...">
-            </MenuButton>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></MenuButton>
             <MenuButton mnemonicParsing="false" text="Egyéb műveletek">
               <items>
                 <MenuItem fx:id="invertImageButton" mnemonicParsing="false" text="Kép invertálás" />
                 <MenuItem fx:id="grayscaleImageButton" mnemonicParsing="false" text="Szürkeskála" />
               </items>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </MenuButton>
             <MenuButton fx:id="addToAlbumButton" mnemonicParsing="false" text="+ Albumhoz hozzáadás">
               <items>
                 <MenuItem fx:id="createNewAlbum" mnemonicParsing="false" text="Új album létrehozása" />
               </items>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </MenuButton>
-            <Button fx:id="slideShowButton" mnemonicParsing="false" text="Lejátszás" />
-            <Button mnemonicParsing="false" text="Rajz" />
-            <Button fx:id="zoomInButton" mnemonicParsing="false" />
-            <Button fx:id="zoomOutButton" mnemonicParsing="false" />
+            <Button fx:id="slideShowButton" mnemonicParsing="false" text="Lejátszás">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <ToggleButton fx:id="drawButton" mnemonicParsing="false" text="Rajz">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <Button fx:id="zoomInButton" mnemonicParsing="false">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="zoomOutButton" mnemonicParsing="false">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
         </items>
       </ToolBar>
-      <HBox fx:id="root" alignment="CENTER">
+      <HBox fx:id="drawSlider" prefHeight="0.0" prefWidth="1024.0">
+         <children>
+            <ToggleButton fx:id="pencilDrawButton" mnemonicParsing="false" text="Ceruza">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <toggleGroup>
+                  <ToggleGroup fx:id="draw" />
+               </toggleGroup>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <ToggleButton fx:id="rubberDrawButton" mnemonicParsing="false" text="Radír" toggleGroup="$draw">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <ToggleButton fx:id="lineDrawButton" layoutX="120.0" layoutY="15.0" mnemonicParsing="false" text="Vonal" toggleGroup="$draw">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <ToggleButton fx:id="rectDrawButton" layoutX="226.0" layoutY="15.0" mnemonicParsing="false" text="Négyszög" toggleGroup="$draw">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <ToggleButton fx:id="circleDrawButton" layoutX="332.0" layoutY="15.0" mnemonicParsing="false" text="Kör" toggleGroup="$draw">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <Label fx:id="colorpickerText" text="Szín:">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ColorPicker fx:id="colorDrawPicker">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ColorPicker>
+            <Label fx:id="pencilstrText" text="Vastagság:">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+            <Slider fx:id="pencilstrDrawSlider" minorTickCount="1" showTickLabels="true" showTickMarks="true" snapToTicks="true">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+            </Slider>
+            <ToggleButton fx:id="textDrawButton" mnemonicParsing="false" text="Szöveg:" toggleGroup="$draw">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ToggleButton>
+            <TextField fx:id="writeTextField">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+            </TextField>
+            <Button fx:id="undoDrawButton" mnemonicParsing="false" text="Visszavon">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button fx:id="redoDrawButton" mnemonicParsing="false" text="Helyrehoz">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button fx:id="saveDrawButton" mnemonicParsing="false" text="Mentés" textFill="RED">
+               <HBox.margin>
+                  <Insets bottom="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+         </children>
+      </HBox>
+      <HBox fx:id="root" alignment="CENTER" prefHeight="670.0" prefWidth="1619.0">
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0">
                <children>
-                  <Button fx:id="prevImageButton" mnemonicParsing="false" />
+                  <Button fx:id="prevImageButton" mnemonicParsing="false">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
                </children>
             </HBox>
           <StackPane fx:id="container" alignment="CENTER" prefHeight="640.0">
               <children>
                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+                  <Canvas fx:id="canvasDraw" height="200.0" width="200.0" />
               </children>
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -50,7 +197,10 @@
           </StackPane>
             <HBox alignment="CENTER_RIGHT" prefHeight="100.0">
                <children>
-                  <Button fx:id="nextImageButton" mnemonicParsing="false" />
+                  <Button fx:id="nextImageButton" mnemonicParsing="false">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
                </children>
             </HBox>
          </children>
