@@ -113,7 +113,7 @@ public class Home {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("src/main/resources/AppPictures"));
         imageChanger = new ImageChanger(new Album("src/main/resources/AppPictures"));
-        albumManager = new AlbumManager("src/main/resources/AppPictures/Album");
+        albumManager = new AlbumManager("src/main/resources/AppPictures/Albumok");
         loadAlbums();
 
         createNewAlbum.setOnAction(event -> {
@@ -123,7 +123,7 @@ public class Home {
             Optional<String> result = newAlbumPopup.showAndWait();
             if (result.isPresent() && !newAlbumPopup.getResult().trim().equals("")) {
                 String albumName = newAlbumPopup.getResult();
-                File newAlbum = new File("src/main/resources/AppPictures/Album/" + albumName);
+                File newAlbum = new File("src/main/resources/AppPictures/Albumok/" + albumName);
                 if (!newAlbum.exists()) {
                     if (imageChanger.getCurrentImage() != null && newAlbum.mkdirs()) {
                         String extension = imageChanger.getCurrentImage().getAbsolutePath()
@@ -221,6 +221,7 @@ public class Home {
         });
 
         slideShowButton.setOnAction(event -> {
+            imageChanger.endSlideShow();
             imageChanger.startSlideShow(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
@@ -364,11 +365,11 @@ public class Home {
                     Optional<String> result = newAlbumPopup.showAndWait();
                     if (result.isPresent() && !newAlbumPopup.getResult().trim().equals("")) {
                         String albumName = newAlbumPopup.getResult();
-                        File newAlbum = new File("src/main/resources/AppPictures/Album/" + albumName);
+                        File newAlbum = new File("src/main/resources/AppPictures/Albumok/" + albumName);
                         File oldAlbum = new File(album.getPath().replace('\\', '/'));
                         if(oldAlbum.renameTo(newAlbum)){
                             albumButton.setText(albumName);
-                            album.setPath("src/main/resources/AppPictures/Album/" + albumName);
+                            album.setPath("src/main/resources/AppPictures/Albumok/" + albumName);
                             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                             alert.setTitle("Üzenet");
                             alert.setHeaderText("Az albumot sikeresen átnevezted!");
