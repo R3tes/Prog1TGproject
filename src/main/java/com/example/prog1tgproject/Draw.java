@@ -1,74 +1,50 @@
 package com.example.prog1tgproject;
 
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import java.awt.*;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Stack;
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Cursor;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 import javafx.scene.text.Font;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javax.imageio.ImageIO;
+
+import java.util.NoSuchElementException;
+import java.util.Stack;
 
 public class Draw {
 
-    private ImageView imageView;
+    private StackPane container;
+    private final ImageView imageView;
     private Image image;
-    private Canvas canvas;
-    private ToggleButton pencilDrawButton;
-    private ToggleButton rubberDrawButton;
-    private ToggleButton lineDrawButton;
-    private ToggleButton rectDrawButton;
-    private ToggleButton circleDrawButton;
-    private Slider pencilstrDrawSlider;
-    private ColorPicker colorDrawPicker;
-    private ToggleButton textDrawButton;
-    private Button undoDrawButton;
-    private Button redoDrawButton;
-    private Button saveDrawButton;
-    private TextField writeTextField;
+    private final Canvas canvasDraw;
+    private final ToggleButton pencilDrawButton;
+    private final ToggleButton rubberDrawButton;
+    private final ToggleButton lineDrawButton;
+    private final ToggleButton rectDrawButton;
+    private final ToggleButton circleDrawButton;
+    private final Slider pencilstrDrawSlider;
+    private final ColorPicker colorDrawPicker;
+    private final ToggleButton textDrawButton;
+    private final Button undoDrawButton;
+    private final Button redoDrawButton;
+    private final Button saveDrawButton;
+    private final TextField writeTextField;
 
-    private Stack<Shape> undoHistory = new Stack();
-    private Stack<Shape> redoHistory = new Stack();
+    private final Stack<Shape> undoHistory = new Stack();
+    private final Stack<Shape> redoHistory = new Stack();
 
-    public Draw(ImageView imageView, Canvas canvas, ToggleButton pencilDrawButton, ToggleButton lineDrawButton, ToggleButton rectDrawButton,
+    private final Stack<Image> undoStack = new Stack<>();
+    private final Stack<Image> redoStack = new Stack<>();
+
+    public GraphicsContext gc;
+
+    public Draw(StackPane container, ImageView imageView, Canvas canvasDraw, ToggleButton pencilDrawButton, ToggleButton lineDrawButton, ToggleButton rectDrawButton,
                 ToggleButton circleDrawButton, ToggleButton rubberDrawButton, ColorPicker colorDrawPicker, Slider pencilstrDrawSlider,
-                ToggleButton textDrawButton, Button undoDrawButton, Button redoDrawButton,Button saveDrawButton, TextField writeTextField) {
+                ToggleButton textDrawButton, Button undoDrawButton, Button redoDrawButton, Button saveDrawButton, TextField writeTextField) {
         this.imageView = imageView;
-        this.canvas = canvas;
+        this.canvasDraw = canvasDraw;
         this.pencilDrawButton = pencilDrawButton;
         this.rubberDrawButton = rubberDrawButton;
         this.circleDrawButton = circleDrawButton;
@@ -81,28 +57,32 @@ public class Draw {
         this.redoDrawButton = redoDrawButton;
         this.saveDrawButton = saveDrawButton;
         this.writeTextField = writeTextField;
+        this.container = container;
     }
 
     public void initializeDraw() {
         image = imageView.getImage();
+        double aspectRatio = image.getWidth() / image.getHeight();
+        double realWidth = Math.min(imageView.getFitWidth(), imageView.getFitHeight() * aspectRatio);
+        double realHeight = Math.min(imageView.getFitHeight(), imageView.getFitWidth() / aspectRatio);
+        canvasDraw.setHeight(realHeight);
+        canvasDraw.setWidth(realWidth);
 
-        //ColorPicker cpLine = new ColorPicker(Color.BLACK);
+        gc = canvasDraw.getGraphicsContext2D();
 
-        canvas.setHeight(imageView.getFitHeight());
-        canvas.setWidth(imageView.getFitWidth());
-
-        GraphicsContext gc;
-        canvas.getGraphicsContext2D().drawImage(image,imageView.getFitWidth(), imageView.getFitHeight());
-        gc = canvas.getGraphicsContext2D();
+        //gc.setFill(Color.GOLD);
+        //gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        //gc.setGlobalBlendMode(BlendMode.SCREEN);
+        //gc.setGlobalAlpha(opacity);
         gc.setLineWidth(1);
-
-        //gc.drawImage(image, 0, 0);
+        gc.drawImage(image, canvasDraw.getWidth(), canvasDraw.getHeight());
+        gc.clearRect(0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
 
         Line line = new Line();
         Rectangle rect = new Rectangle();
         Circle circ = new Circle();
 
-        canvas.setOnMousePressed(e -> {
+        canvasDraw.setOnMousePressed(e -> {
             if (pencilDrawButton.isSelected()) {
                 gc.setStroke(colorDrawPicker.getValue());
                 gc.beginPath();
@@ -127,7 +107,7 @@ public class Draw {
             }
         });
 
-        canvas.setOnMouseDragged(e -> {
+        canvasDraw.setOnMouseDragged(e -> {
             if (pencilDrawButton.isSelected()) {
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
@@ -137,7 +117,7 @@ public class Draw {
             }
         });
 
-        canvas.setOnMouseReleased(e -> {
+        canvasDraw.setOnMouseReleased(e -> {
             if (pencilDrawButton.isSelected()) {
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
@@ -182,8 +162,7 @@ public class Draw {
                 gc.strokeOval(circ.getCenterX(), circ.getCenterY(), circ.getRadius(), circ.getRadius());
 
                 undoHistory.push(new Circle(circ.getCenterX(), circ.getCenterY(), circ.getRadius()));
-            }
-            else if(textDrawButton.isSelected()) {
+            } else if (textDrawButton.isSelected()) {
                 gc.setLineWidth(1);
                 gc.setFont(Font.font(pencilstrDrawSlider.getValue()));
                 gc.setStroke(colorDrawPicker.getValue());
@@ -191,22 +170,22 @@ public class Draw {
                 gc.fillText(writeTextField.getText(), e.getX(), e.getY());
                 gc.strokeText(writeTextField.getText(), e.getX(), e.getY());
             }
-            redoHistory.clear();
-            Shape lastUndo = undoHistory.lastElement();
-            lastUndo.setFill(gc.getFill());
-            lastUndo.setStroke(gc.getStroke());
-            lastUndo.setStrokeWidth(gc.getLineWidth());
 
+            try {
+                redoHistory.clear();
+                Shape lastUndo = undoHistory.lastElement();
+                lastUndo.setFill(gc.getFill());
+                lastUndo.setStroke(gc.getStroke());
+                lastUndo.setStrokeWidth(gc.getLineWidth());
+            } catch (NoSuchElementException ex){
+
+            }
         });
 
         // Color picker
         colorDrawPicker.setOnAction(e -> {
             gc.setStroke(colorDrawPicker.getValue());
         });
-
-        /*cpFill.setOnAction(e -> {
-            gc.setFill(cpFill.getValue());
-        })*/
 
         // Pencil strength slider
         pencilstrDrawSlider.valueProperty().addListener(e -> {
@@ -216,38 +195,34 @@ public class Draw {
                 gc.setFont(Font.font(pencilstrDrawSlider.getValue()));
                 return;
             }
-            //line_width.setText(String.format("%.1f", width));
             gc.setLineWidth(width);
         });
 
         //Undo Button
-        undoDrawButton.setOnAction(e->{
-            if(!undoHistory.empty()){
+        undoDrawButton.setOnAction(e -> {
+            if (!undoHistory.empty()) {
                 gc.clearRect(0, 0, 1080, 790);
                 Shape removedShape = undoHistory.lastElement();
-                if(removedShape.getClass() == Line.class) {
+                if (removedShape.getClass() == Line.class) {
                     Line tempLine = (Line) removedShape;
                     tempLine.setFill(gc.getFill());
                     tempLine.setStroke(gc.getStroke());
                     tempLine.setStrokeWidth(gc.getLineWidth());
                     redoHistory.push(new Line(tempLine.getStartX(), tempLine.getStartY(), tempLine.getEndX(), tempLine.getEndY()));
 
-                }
-                else if(removedShape.getClass() == Rectangle.class) {
+                } else if (removedShape.getClass() == Rectangle.class) {
                     Rectangle tempRect = (Rectangle) removedShape;
                     tempRect.setFill(gc.getFill());
                     tempRect.setStroke(gc.getStroke());
                     tempRect.setStrokeWidth(gc.getLineWidth());
                     redoHistory.push(new Rectangle(tempRect.getX(), tempRect.getY(), tempRect.getWidth(), tempRect.getHeight()));
-                }
-                else if(removedShape.getClass() == Circle.class) {
+                } else if (removedShape.getClass() == Circle.class) {
                     Circle tempCirc = (Circle) removedShape;
                     tempCirc.setStrokeWidth(gc.getLineWidth());
                     tempCirc.setFill(gc.getFill());
                     tempCirc.setStroke(gc.getStroke());
                     redoHistory.push(new Circle(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius()));
-                }
-                else if(removedShape.getClass() == Ellipse.class) {
+                } else if (removedShape.getClass() == Ellipse.class) {
                     Ellipse tempElps = (Ellipse) removedShape;
                     tempElps.setFill(gc.getFill());
                     tempElps.setStroke(gc.getStroke());
@@ -260,32 +235,29 @@ public class Draw {
                 lastRedo.setStrokeWidth(removedShape.getStrokeWidth());
                 undoHistory.pop();
 
-                for(int i=0; i < undoHistory.size(); i++) {
+                for (int i = 0; i < undoHistory.size(); i++) {
                     Shape shape = undoHistory.elementAt(i);
-                    if(shape.getClass() == Line.class) {
+                    if (shape.getClass() == Line.class) {
                         Line temp = (Line) shape;
                         gc.setLineWidth(temp.getStrokeWidth());
                         gc.setStroke(temp.getStroke());
                         gc.setFill(temp.getFill());
                         gc.strokeLine(temp.getStartX(), temp.getStartY(), temp.getEndX(), temp.getEndY());
-                    }
-                    else if(shape.getClass() == Rectangle.class) {
+                    } else if (shape.getClass() == Rectangle.class) {
                         Rectangle temp = (Rectangle) shape;
                         gc.setLineWidth(temp.getStrokeWidth());
                         gc.setStroke(temp.getStroke());
                         gc.setFill(temp.getFill());
                         gc.fillRect(temp.getX(), temp.getY(), temp.getWidth(), temp.getHeight());
                         gc.strokeRect(temp.getX(), temp.getY(), temp.getWidth(), temp.getHeight());
-                    }
-                    else if(shape.getClass() == Circle.class) {
+                    } else if (shape.getClass() == Circle.class) {
                         Circle temp = (Circle) shape;
                         gc.setLineWidth(temp.getStrokeWidth());
                         gc.setStroke(temp.getStroke());
                         gc.setFill(temp.getFill());
                         gc.fillOval(temp.getCenterX(), temp.getCenterY(), temp.getRadius(), temp.getRadius());
                         gc.strokeOval(temp.getCenterX(), temp.getCenterY(), temp.getRadius(), temp.getRadius());
-                    }
-                    else if(shape.getClass() == Ellipse.class) {
+                    } else if (shape.getClass() == Ellipse.class) {
                         Ellipse temp = (Ellipse) shape;
                         gc.setLineWidth(temp.getStrokeWidth());
                         gc.setStroke(temp.getStroke());
@@ -300,34 +272,31 @@ public class Draw {
         });
 
         // Redo Button
-        redoDrawButton.setOnAction(e->{
-            if(!redoHistory.empty()) {
+        redoDrawButton.setOnAction(e -> {
+            if (!redoHistory.empty()) {
                 Shape shape = redoHistory.lastElement();
                 gc.setLineWidth(shape.getStrokeWidth());
                 gc.setStroke(shape.getStroke());
                 gc.setFill(shape.getFill());
 
                 redoHistory.pop();
-                if(shape.getClass() == Line.class) {
+                if (shape.getClass() == Line.class) {
                     Line tempLine = (Line) shape;
                     gc.strokeLine(tempLine.getStartX(), tempLine.getStartY(), tempLine.getEndX(), tempLine.getEndY());
                     undoHistory.push(new Line(tempLine.getStartX(), tempLine.getStartY(), tempLine.getEndX(), tempLine.getEndY()));
-                }
-                else if(shape.getClass() == Rectangle.class) {
+                } else if (shape.getClass() == Rectangle.class) {
                     Rectangle tempRect = (Rectangle) shape;
                     gc.fillRect(tempRect.getX(), tempRect.getY(), tempRect.getWidth(), tempRect.getHeight());
                     gc.strokeRect(tempRect.getX(), tempRect.getY(), tempRect.getWidth(), tempRect.getHeight());
 
                     undoHistory.push(new Rectangle(tempRect.getX(), tempRect.getY(), tempRect.getWidth(), tempRect.getHeight()));
-                }
-                else if(shape.getClass() == Circle.class) {
+                } else if (shape.getClass() == Circle.class) {
                     Circle tempCirc = (Circle) shape;
                     gc.fillOval(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius(), tempCirc.getRadius());
                     gc.strokeOval(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius(), tempCirc.getRadius());
 
                     undoHistory.push(new Circle(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius()));
-                }
-                else if(shape.getClass() == Ellipse.class) {
+                } else if (shape.getClass() == Ellipse.class) {
                     Ellipse tempElps = (Ellipse) shape;
                     gc.fillOval(tempElps.getCenterX(), tempElps.getCenterY(), tempElps.getRadiusX(), tempElps.getRadiusY());
                     gc.strokeOval(tempElps.getCenterX(), tempElps.getCenterY(), tempElps.getRadiusX(), tempElps.getRadiusY());
@@ -338,21 +307,23 @@ public class Draw {
                 lastUndo.setFill(gc.getFill());
                 lastUndo.setStroke(gc.getStroke());
                 lastUndo.setStrokeWidth(gc.getLineWidth());
+
             } else {
                 System.out.println("Minden helyrehozva");
             }
         });
 
         // Save
-        /*saveButton.setOnAction((e)->{
+        /*saveDrawButton.setOnAction((e)->{
             FileChooser savefile = new FileChooser();
+            //new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
             savefile.setTitle("Save File");
 
-            File file = savefile.showSaveDialog(primaryStage);
+            File file = savefile.showSaveDialog(imageView.getScene().getWindow());
             if (file != null) {
                 try {
-                    WritableImage writableImage = new WritableImage(1080, 790);
-                    canvas.snapshot(null, writableImage);
+                    WritableImage writableImage = new WritableImage((int)canvasDraw.getWidth(), (int)canvasDraw.getHeight());
+                    canvasDraw.snapshot(null, writableImage);
                     RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
                     ImageIO.write(renderedImage, "png", file);
                 } catch (IOException ex) {
@@ -361,5 +332,25 @@ public class Draw {
             }
 
         });*/
+
+        /*saveDrawButton.setOnAction((e)-> {
+            FileChooser savefile = new FileChooser();
+            //new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
+            savefile.setTitle("Save File");
+
+            File file = savefile.showSaveDialog(imageView.getScene().getWindow());
+            if (file != null) {
+                try {
+                    WritableImage writableImage = new WritableImage((int) canvasDraw.getWidth(), (int) canvasDraw.getHeight());
+                    container.snapshot(new SnapshotParameters(), writableImage);
+                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+                    ImageIO.write(renderedImage, "png", file);
+                } catch (IOException ex) {
+                    System.out.println("Error!");
+                }
+            }
+        });*/
+
     }
+
 }

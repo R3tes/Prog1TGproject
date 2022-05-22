@@ -1,11 +1,13 @@
 package com.example.prog1tgproject;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -14,13 +16,15 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -31,16 +35,19 @@ import java.util.regex.Pattern;
 
 public class Home {
     @FXML
+    private VBox mainWindow;
+
+    @FXML
     private ImageView imageView;
 
     @FXML
     private ToolBar toolBar;
 
     @FXML
-    private MenuButton opButton, addToAlbumButton;
+    private MenuButton opButton, addToAlbumButton, filterButton;
 
     @FXML
-    private MenuItem createNewAlbum, invertImageButton, grayscaleImageButton;
+    private MenuItem createNewAlbum, invertImageButton, grayscaleImageButton, blackandwhiteImageButton,  blueImageButton, greenImageButton, redImageButton;
 
     @FXML
     private Button prevImageButton, nextImageButton, slideShowButton, zoomInButton, zoomOutButton;
@@ -58,7 +65,7 @@ public class Home {
     private Canvas canvasDraw;
 
     @FXML
-    public ToggleButton pencilDrawButton,lineDrawButton,rectDrawButton,circleDrawButton,rubberDrawButton,textDrawButton;
+    public ToggleButton pencilDrawButton, lineDrawButton, rectDrawButton, circleDrawButton, rubberDrawButton, textDrawButton;
 
     @FXML
     public ColorPicker colorDrawPicker;
@@ -67,14 +74,14 @@ public class Home {
     public Slider pencilstrDrawSlider;
 
     @FXML
-    private Label pencilstrText,colorpickerText;
+    private Label pencilstrText, colorpickerText;
 
     @FXML
     private TextField writeTextField;
 
     @FXML
     private Button undoDrawButton, saveDrawButton, redoDrawButton;
-    
+
 
     File currentFile;
     ImageChanger imageChanger;
@@ -91,7 +98,7 @@ public class Home {
         drawSlider.setVisible(false);
 
         zoom = new Zoom(imageView);
-        draw = new Draw(imageView, canvasDraw,pencilDrawButton,lineDrawButton,rectDrawButton,circleDrawButton,rubberDrawButton,
+        draw = new Draw(container, imageView, canvasDraw, pencilDrawButton, lineDrawButton, rectDrawButton, circleDrawButton, rubberDrawButton,
                 colorDrawPicker, pencilstrDrawSlider, textDrawButton, undoDrawButton, redoDrawButton, saveDrawButton, writeTextField);
         imageView.fitWidthProperty().bind(container.widthProperty());
         imageView.fitHeightProperty().bind(container.heightProperty());
@@ -185,6 +192,28 @@ public class Home {
             }
         });
 
+        /*saveDrawButton.setOnAction((e) -> {
+            FileChooser savefile = new FileChooser();
+            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
+            savefile.setTitle("Save File");
+
+            double aspectRatio = img.getWidth() / img.getHeight();
+            double realWidth = Math.max(imageView.getFitWidth(), imageView.getFitHeight() * aspectRatio);
+            double realHeight = Math.max(imageView.getFitHeight(), imageView.getFitWidth() / aspectRatio);
+
+            File file = savefile.showSaveDialog(imageView.getScene().getWindow());
+            if (file != null) {
+                try {
+                    WritableImage writableImage = new WritableImage((int) realWidth, (int) realHeight);
+                    container.snapshot(new SnapshotParameters(), writableImage);
+                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+                    ImageIO.write(renderedImage, "png", file);
+                } catch (IOException ex) {
+                    System.out.println("Error!");
+                }
+            }
+        });*/
+
         setGraphic(prevImageButton, "/media/left-button.png", 43, 43);
         prevImageButton.setOnAction(event -> {
             imageChanger.endSlideShow();
@@ -192,7 +221,13 @@ public class Home {
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
 
-            draw.initializeDraw();
+            setDrawToDefault();
+            drawButton.setSelected(false);
+            try {
+                draw.initializeDraw();
+            } catch (NullPointerException exep){
+
+            }
         });
 
         setGraphic(nextImageButton, "/media/right-button.png", 43, 43);
@@ -202,7 +237,13 @@ public class Home {
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
 
-            draw.initializeDraw();
+            setDrawToDefault();
+            drawButton.setSelected(false);
+            try {
+                draw.initializeDraw();
+            } catch (NullPointerException exep){
+
+            }
         });
 
         opButton.setOnKeyPressed(keyEvent -> {
@@ -240,13 +281,11 @@ public class Home {
             zoom.setZoom(-34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
         });
 
-
         drawButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue){
+            if (newValue) {
                 drawSlider.setVisible(true);
-                //imageView.setVisible(false);
-                //canvasDraw.setVisible(true);
-            }else {
+
+            } else {
                 drawSlider.setVisible(false);
 
                 /*Image img;
@@ -255,6 +294,8 @@ public class Home {
                 imageView.setImage(img);*/
             }
         });
+
+
     }
 
     private void setBufferedImage(File currentImage) {
@@ -323,11 +364,13 @@ public class Home {
             boolean isSaved = ImageIO.write(img, extension, targetDirectory);
             if (!isSaved) {
                 BufferedImage image = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+
                 for (int y = 0; y < img.getHeight(); y++) {
                     for (int x = 0; x < img.getWidth(); x++) {
                         image.setRGB(x, y, img.getRGB(x, y));
                     }
                 }
+
                 ImageIO.write(image, extension, targetDirectory);
             }
         } catch (IOException e) {
@@ -348,7 +391,7 @@ public class Home {
             }
             if (!exits) {
                 Menu albumButton = new Menu(splitPath[splitPath.length - 1]);
-                MenuItem addPhoto  = new MenuItem("Kép hozzáadása");
+                MenuItem addPhoto = new MenuItem("Kép hozzáadása");
                 addPhoto.setOnAction(event -> {
                     String extension = imageChanger.getCurrentImage().getAbsolutePath()
                             .substring(imageChanger.getCurrentImage().getAbsolutePath().length() - 3);
@@ -356,7 +399,7 @@ public class Home {
                     saveImage(extension, targetDirectory);
                 });
 
-                MenuItem renameAlbum  = new MenuItem("Átnevezés");
+                MenuItem renameAlbum = new MenuItem("Átnevezés");
                 renameAlbum.setOnAction(event -> {
                     TextInputDialog newAlbumPopup = new TextInputDialog();
                     newAlbumPopup.setTitle("Átnevezés");
@@ -366,14 +409,14 @@ public class Home {
                         String albumName = newAlbumPopup.getResult();
                         File newAlbum = new File("src/main/resources/AppPictures/Album/" + albumName);
                         File oldAlbum = new File(album.getPath().replace('\\', '/'));
-                        if(oldAlbum.renameTo(newAlbum)){
+                        if (oldAlbum.renameTo(newAlbum)) {
                             albumButton.setText(albumName);
                             album.setPath("src/main/resources/AppPictures/Album/" + albumName);
                             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                             alert.setTitle("Üzenet");
                             alert.setHeaderText("Az albumot sikeresen átnevezted!");
                             alert.showAndWait();
-                        }else{
+                        } else {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Hiba");
                             alert.setHeaderText("Hiba történt az album átnevezése során!");
@@ -382,17 +425,17 @@ public class Home {
                     }
                 });
 
-                MenuItem deleteAlbum  = new MenuItem("Törlés");
+                MenuItem deleteAlbum = new MenuItem("Törlés");
                 deleteAlbum.setOnAction(event -> {
                     File albumToDelete = new File(album.getPath().replace('\\', '/'));
-                    if(deleteFolder(albumToDelete)){
+                    if (deleteFolder(albumToDelete)) {
                         addToAlbumButton.getItems().remove(albumButton);
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("Üzenet");
                         alert.setHeaderText("Az albumot sikeresen törölted!");
                         alert.showAndWait();
 
-                    }else{
+                    } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Hiba");
                         alert.setHeaderText("Hiba történt az album törlése során!");
@@ -406,17 +449,28 @@ public class Home {
         }
     }
 
-    private boolean deleteFolder(File folder){
+    private boolean deleteFolder(File folder) {
         File[] files = folder.listFiles();
-        if(files != null && files.length > 0){
-            for(File file : files){
-                if(!file.isDirectory()){
+        if (files != null && files.length > 0) {
+            for (File file : files) {
+                if (!file.isDirectory()) {
                     file.delete();
-                }else{
+                } else {
                     deleteFolder(file);
                 }
             }
         }
         return folder.delete();
+    }
+
+    public void setDrawToDefault(){
+        pencilDrawButton.setSelected(false);
+        rubberDrawButton.setSelected(false);
+        lineDrawButton.setSelected(false);
+        rectDrawButton.setSelected(false);
+        circleDrawButton.setSelected(false);
+        colorDrawPicker.setValue(Color.WHITE);
+        pencilstrDrawSlider.setValue(0);
+        writeTextField.setText("");
     }
 }
