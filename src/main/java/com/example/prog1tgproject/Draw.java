@@ -77,6 +77,7 @@ public class Draw {
         gc.setLineWidth(1);
         gc.drawImage(image, canvasDraw.getWidth(), canvasDraw.getHeight());
         gc.clearRect(0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
+        canvasDraw.setVisible(true);
 
         Line line = new Line();
         Rectangle rect = new Rectangle();

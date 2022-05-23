@@ -96,6 +96,7 @@ public class Home {
 
         loadPlugins();
         drawSlider.setVisible(false);
+        canvasDraw.setVisible(false);
 
         zoom = new Zoom(imageView);
         draw = new Draw(container, imageView, canvasDraw, pencilDrawButton, lineDrawButton, rectDrawButton, circleDrawButton, rubberDrawButton,
@@ -105,6 +106,12 @@ public class Home {
         container.setAlignment(imageView, Pos.CENTER);
         root.setFillHeight(true);
         HBox.setHgrow(container, Priority.ALWAYS);
+
+        /*Filters filters = new Filters(filterButton, imageView, container);
+        //imageView.setImage(filters.createFilter());
+        filterButton.setOnKeyPressed(actionEvent -> {
+            imageView.setImage(filters.createFilter());
+        });*/
 
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
@@ -163,7 +170,6 @@ public class Home {
                     Rectangle2D viewport = imageView.getViewport();
                     zoom.refresh(imageView);
 
-                    draw.initializeDraw();
                 }
             }
         });
@@ -220,14 +226,6 @@ public class Home {
             imageChanger.previousImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
-
-            setDrawToDefault();
-            drawButton.setSelected(false);
-            try {
-                draw.initializeDraw();
-            } catch (NullPointerException exep){
-
-            }
         });
 
         setGraphic(nextImageButton, "/media/right-button.png", 43, 43);
@@ -237,13 +235,6 @@ public class Home {
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
 
-            setDrawToDefault();
-            drawButton.setSelected(false);
-            try {
-                draw.initializeDraw();
-            } catch (NullPointerException exep){
-
-            }
         });
 
         opButton.setOnKeyPressed(keyEvent -> {
@@ -271,6 +262,12 @@ public class Home {
         setGraphic(zoomInButton, "/media/zoom-in.png", 20, 18);
         zoomInButton.setOnAction(event -> {
             imageChanger.endSlideShow();
+
+            setDrawToDefault();
+            canvasDraw.setVisible(false);
+            drawSlider.setVisible(false);
+            drawButton.setSelected(false);
+            
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.setZoom(34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
         });
@@ -278,6 +275,13 @@ public class Home {
         setGraphic(zoomOutButton, "/media/zoom-out.png", 20, 18);
         zoomOutButton.setOnAction(event -> {
             imageChanger.endSlideShow();
+
+            setDrawToDefault();
+            canvasDraw.setVisible(false);
+            drawSlider.setVisible(false);
+            drawButton.setSelected(false);
+
+            setDrawToDefault();
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.setZoom(-34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
         });
@@ -286,13 +290,19 @@ public class Home {
             if (newValue) {
                 drawSlider.setVisible(true);
 
+                setDrawToDefault();
+                zoom.refresh(imageView);
+                try {
+                    if(imageView.getImage()!=null){
+                        draw.initializeDraw();
+                    }
+                } catch (NullPointerException exep){
+
+                }
             } else {
                 drawSlider.setVisible(false);
-
-                /*Image img;
-                img = imageView.getImage();
-                canvasDraw.getGraphicsContext2D().drawImage(img,0,0);
-                imageView.setImage(img);*/
+                setDrawToDefault();
+                canvasDraw.setVisible(false);
             }
         });
 

@@ -5,59 +5,63 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public class Filters {
+public class Filters extends Home {
+
+    private final MenuButton filterButton;
+    private final StackPane container;
+    private final ImageView imageView;
+    private Image image;
+
+    public Filters(MenuButton filterButton, ImageView imageView, StackPane container) {
+        this.filterButton = filterButton;
+        this.imageView = imageView;
+        this.container = container;
+    }
+
+    //private final List<MenuItem> menuItems = new ArrayList<>();
 
     private List<Filter> filters = Arrays.asList(
-            new Filter("Invert", c -> c.invert()),
-            new Filter("Grayscale", c -> c.grayscale()),
-            new Filter("Black and White", c -> valueOf(c) < 1.5 ? Color.BLACK : Color.WHITE),
-            new Filter("Red", c -> Color.color(1.0, c.getGreen(), c.getBlue())),
-            new Filter("Green", c -> Color.color(c.getRed(), 1.0, c.getBlue())),
-            new Filter("Blue", c -> Color.color(c.getRed(), c.getGreen(), 1.0))
+            new Filter("Inverz", c -> c.invert()),
+            new Filter("Szürkeskála", c -> c.grayscale()),
+            new Filter("Fekete-fehér", c -> valueOf(c) < 1.5 ? Color.BLACK : Color.WHITE),
+            new Filter("Vörös", c -> Color.color(1.0, c.getGreen(), c.getBlue())),
+            new Filter("Zöld", c -> Color.color(c.getRed(), 1.0, c.getBlue())),
+            new Filter("Kék", c -> Color.color(c.getRed(), c.getGreen(), 1.0))
     );
 
     private double valueOf(Color c) {
         return c.getRed() + c.getGreen() + c.getBlue();
     }
 
-    private Parent createFilter() {
-        BorderPane root = new BorderPane();
-        root.setPrefSize(800, 600);
+    public Image createFilter() {
+        ImageView imageView2 = new ImageView();
 
-        ImageView view1 = new ImageView(new Image("https://placekitten.com/400/550", true));
-        ImageView view2 = new ImageView();
-
-        MenuBar bar = new MenuBar();
-        Menu menu = new Menu("Filter...");
-
-        filters.forEach(filter -> {
-            MenuItem item = new MenuItem(filter.name);
+        filters.forEach(filterItem -> {
+            MenuItem item = new MenuItem(filterItem.name);
             item.setOnAction(e -> {
-                view2.setImage(filter.apply(view1.getImage()));
+                imageView2.setImage(filterItem.apply(imageView.getImage()));
             });
 
-            menu.getItems().add(item);
+            filterButton.getItems().add(item);
         });
 
-        bar.getMenus().add(menu);
-
-        root.setTop(bar);
-        root.setCenter(new HBox(view1, view2));
-
-        return root;
+        return imageView2.getImage();
     }
 
     private static class Filter implements Function<Image, Image> {
@@ -72,13 +76,13 @@ public class Filters {
 
         @Override
         public Image apply(Image source) {
-            int w = (int) source.getWidth();
-            int h = (int) source.getHeight();
+            int imgWidth = (int) source.getWidth();
+            int imgHeight = (int) source.getHeight();
 
-            WritableImage image = new WritableImage(w, h);
+            WritableImage image = new WritableImage(imgWidth, imgHeight);
 
-            for (int y = 0; y < h; y++) {
-                for (int x = 0; x < w; x++) {
+            for (int y = 0; y < imgHeight; y++) {
+                for (int x = 0; x < imgWidth; x++) {
                     Color c1 = source.getPixelReader().getColor(x, y);
                     Color c2 = colorMap.apply(c1);
 
@@ -89,4 +93,6 @@ public class Filters {
             return image;
         }
     }
+
+
 }

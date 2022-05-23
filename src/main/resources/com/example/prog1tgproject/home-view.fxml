@@ -28,14 +28,6 @@
                   <Cursor fx:constant="HAND" />
                </cursor></MenuButton>
             <MenuButton fx:id="filterButton" mnemonicParsing="false" text="Szűrők">
-              <items>
-                <MenuItem fx:id="invertImageButton" mnemonicParsing="false" text="Kép invertálás" />
-                <MenuItem fx:id="grayscaleImageButton" mnemonicParsing="false" text="Szürkeskála" />
-                  <MenuItem fx:id="blackandwhiteImageButton" mnemonicParsing="false" text="Fekete-Fehér" />
-                  <MenuItem fx:id="redImageButton" mnemonicParsing="false" text="Vörös" />
-                  <MenuItem fx:id="greenImageButton" mnemonicParsing="false" text="Zöld" />
-                  <MenuItem fx:id="blueImageButton" mnemonicParsing="false" text="Kék" />
-              </items>
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
