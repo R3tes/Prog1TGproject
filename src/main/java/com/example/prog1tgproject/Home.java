@@ -9,16 +9,14 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
@@ -93,7 +91,7 @@ public class Home {
 
     @FXML
     private void initialize() {
-
+        container.setStyle("-fx-background-color: white;");
         loadPlugins();
         drawSlider.setVisible(false);
         canvasDraw.setVisible(false);
@@ -215,35 +213,12 @@ public class Home {
             File file = savefile.showSaveDialog(imageView.getScene().getWindow());
             if (file != null) {
 
-                double aspectRatio = img.getWidth() / img.getHeight();
-                double realWidth = Math.min(imageView.getFitWidth(), imageView.getFitHeight() * aspectRatio);
-                double realHeight = Math.min(imageView.getFitHeight(), imageView.getFitWidth() / aspectRatio);
-
-                int initialWidth = (int)container.getWidth();
-                int initialHeight = (int)container.getHeight();
-                container.resize(realWidth, (int)imageView.getLayoutBounds().getHeight());
-
-                WritableImage writableImage = container.snapshot(new SnapshotParameters(), null);
+                WritableImage writableImage = canvasDraw.snapshot(new SnapshotParameters(), null);
 
                 System.out.println(writableImage.getWidth() + " " + writableImage.getHeight());
                 BufferedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
                 String extension = file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3);
                 saveImage(renderedImage, extension, file);
-
-                container.resize(initialWidth, initialHeight);
-                /*try {
-                    System.out.println(img.getWidth() + " " + img.getHeight());
-                    WritableImage writableImage = new WritableImage(img.getWidth(), img.getHeight());
-                    container.snapshot(new SnapshotParameters(), writableImage);
-                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
-                    String extension = file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3);
-                    saveImage((BufferedImage) renderedImage, extension, file);
-                    System.out.println(file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3));
-                    ImageIO.write(renderedImage, file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3), file);
-                } catch (IOException ex) {
-                    System.out.println("Error!");
-                }
-*/
             }
         });
 
@@ -318,6 +293,7 @@ public class Home {
         });
 
         drawButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+
             if (newValue) {
                 drawSlider.setVisible(true);
 
@@ -326,6 +302,7 @@ public class Home {
                 try {
                     if(imageView.getImage()!=null){
                         draw.initializeDraw();
+                        draw.gc.drawImage(imageView.getImage(), 0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
                     }
                 } catch (NullPointerException exep){
 

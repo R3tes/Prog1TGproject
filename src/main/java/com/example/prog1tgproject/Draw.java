@@ -77,7 +77,7 @@ public class Draw {
         //gc.setGlobalBlendMode(BlendMode.SCREEN);
         //gc.setGlobalAlpha(opacity);
         gc.setLineWidth(1);
-        gc.drawImage(image, canvasDraw.getWidth(), canvasDraw.getHeight());
+        gc.drawImage(image, 0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
         gc.clearRect(0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
         canvasDraw.setVisible(true);
 
@@ -355,5 +355,4 @@ public class Draw {
         });*/
 
     }
-
 }
