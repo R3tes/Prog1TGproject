@@ -91,7 +91,7 @@ public class Home {
 
     @FXML
     private void initialize() {
-        container.setStyle("-fx-background-color: white;");
+
         loadPlugins();
         drawSlider.setVisible(false);
         canvasDraw.setVisible(false);
@@ -151,6 +151,21 @@ public class Home {
 
         prop.setOnAction(actionEvent -> {
 
+        });
+
+        save.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                imageChanger.endSlideShow();
+
+                refreshDraw();
+
+                File dir = imageChanger.getCurrentImage();
+                if (dir != null) {
+                    String extension = dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3);
+                    saveImage(img, extension, dir);
+                }
+            }
         });
 
         open.setOnAction(new EventHandler<ActionEvent>() {

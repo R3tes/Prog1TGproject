@@ -72,10 +72,6 @@ public class Draw {
 
         gc = canvasDraw.getGraphicsContext2D();
 
-        //gc.setFill(Color.GOLD);
-        //gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        //gc.setGlobalBlendMode(BlendMode.SCREEN);
-        //gc.setGlobalAlpha(opacity);
         gc.setLineWidth(1);
         gc.drawImage(image, 0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
         gc.clearRect(0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
@@ -315,44 +311,6 @@ public class Draw {
                 System.out.println("Minden helyrehozva");
             }
         });
-
-        // Save
-        /*saveDrawButton.setOnAction((e)->{
-            FileChooser savefile = new FileChooser();
-            //new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
-            savefile.setTitle("Save File");
-
-            File file = savefile.showSaveDialog(imageView.getScene().getWindow());
-            if (file != null) {
-                try {
-                    WritableImage writableImage = new WritableImage((int)canvasDraw.getWidth(), (int)canvasDraw.getHeight());
-                    canvasDraw.snapshot(null, writableImage);
-                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
-                    ImageIO.write(renderedImage, "png", file);
-                } catch (IOException ex) {
-                    System.out.println("Error!");
-                }
-            }
-
-        });*/
-
-        /*saveDrawButton.setOnAction((e)-> {
-            FileChooser savefile = new FileChooser();
-            //new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
-            savefile.setTitle("Save File");
-
-            File file = savefile.showSaveDialog(imageView.getScene().getWindow());
-            if (file != null) {
-                try {
-                    WritableImage writableImage = new WritableImage((int) canvasDraw.getWidth(), (int) canvasDraw.getHeight());
-                    container.snapshot(new SnapshotParameters(), writableImage);
-                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
-                    ImageIO.write(renderedImage, "png", file);
-                } catch (IOException ex) {
-                    System.out.println("Error!");
-                }
-            }
-        });*/
 
     }
 }

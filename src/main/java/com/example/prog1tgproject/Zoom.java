@@ -152,24 +152,27 @@ public class Zoom {
         prevZooms.clear();
         prevZooms.add(new Rectangle2D(0, 0, width, height));
         imageView.setViewport(new Rectangle2D(0, 0, width, height));
-
     }
 
     private void shift(Point2D delta) {
-        Rectangle2D viewport = imageView.getViewport();
-        double width = imageView.getImage().getWidth();
-        double height = imageView.getImage().getHeight();
-        double maxX = width - viewport.getWidth();
-        double maxY = height - viewport.getHeight();
-        double minX = clamp(viewport.getMinX() - delta.getX(), 0, maxX);
-        double minY = clamp(viewport.getMinY() - delta.getY(), 0, maxY);
-        if (minX < 0.0) {
-            minX = 0.0;
+        try {
+            Rectangle2D viewport = imageView.getViewport();
+            double width = imageView.getImage().getWidth();
+            double height = imageView.getImage().getHeight();
+            double maxX = width - viewport.getWidth();
+            double maxY = height - viewport.getHeight();
+            double minX = clamp(viewport.getMinX() - delta.getX(), 0, maxX);
+            double minY = clamp(viewport.getMinY() - delta.getY(), 0, maxY);
+            if (minX < 0.0) {
+                minX = 0.0;
+            }
+            if (minY < 0.0) {
+                minY = 0.0;
+            }
+            imageView.setViewport(new Rectangle2D(minX, minY, viewport.getWidth(), viewport.getHeight()));
+        } catch (NullPointerException ex){
+
         }
-        if (minY < 0.0) {
-            minY = 0.0;
-        }
-        imageView.setViewport(new Rectangle2D(minX, minY, viewport.getWidth(), viewport.getHeight()));
     }
 
     private double clamp(double value, double min, double max) {
