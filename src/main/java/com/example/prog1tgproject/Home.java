@@ -105,8 +105,6 @@ public class Home {
         root.setFillHeight(true);
         HBox.setHgrow(container, Priority.ALWAYS);
 
-        Filters filters = new Filters(filterButton, imageView, container);
-
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
         MenuItem savAs = new MenuItem("Mentés másként");
@@ -123,6 +121,7 @@ public class Home {
         imageChanger = new ImageChanger(new Album("src/main/resources/AppPictures"));
         albumManager = new AlbumManager("src/main/resources/AppPictures/Albumok");
         loadAlbums();
+        Filters filters = new Filters(filterButton, imageView, imageChanger);
 
         createNewAlbum.setOnAction(event -> {
             TextInputDialog newAlbumPopup = new TextInputDialog();
@@ -169,6 +168,7 @@ public class Home {
                     imageView.setImage(new Image(imageChanger.getCurrentImage().getAbsolutePath()));
                     setBufferedImage(imageChanger.getCurrentImage());
                     Rectangle2D viewport = imageView.getViewport();
+                    filters.setOriginal(imageView.getImage());
                     zoom.refresh(imageView);
 
                 }
@@ -228,7 +228,7 @@ public class Home {
             imageChanger.previousImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
-
+            filters.setOriginal(imageView.getImage());
             refreshDraw();
         });
 
@@ -238,7 +238,7 @@ public class Home {
             imageChanger.nextImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
-
+            filters.setOriginal(imageView.getImage());
             refreshDraw();
         });
 
@@ -268,6 +268,7 @@ public class Home {
 
             imageChanger.startSlideShow(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
+            filters.setOriginal(imageView.getImage());
             zoom.refresh(imageView);
         });
 
@@ -312,11 +313,6 @@ public class Home {
                 setDrawToDefault();
                 canvasDraw.setVisible(false);
             }
-        });
-
-        //imageView.setImage(filters.createFilter());
-        filterButton.setOnKeyPressed(actionEvent -> {
-            imageView.setImage(filters.createFilter());
         });
 
     }

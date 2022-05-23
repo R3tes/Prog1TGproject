@@ -17,15 +17,15 @@ import java.util.function.Function;
 public class Filters extends Home {
 
     private final MenuButton filterButton;
-    private final StackPane container;
+    private final ImageChanger imageChanger;
     private final ImageView imageView;
-    private Image image;
-    public ImageView imageView2 = new ImageView();
+    private Image original;
 
-    public Filters(MenuButton filterButton, ImageView imageView, StackPane container) {
+    public Filters(MenuButton filterButton, ImageView imageView, ImageChanger imageChanger) {
         this.filterButton = filterButton;
         this.imageView = imageView;
-        this.container = container;
+        this.imageChanger = imageChanger;
+        createFilter();
     }
 
     private List<Filter> filters = Arrays.asList(
@@ -37,34 +37,28 @@ public class Filters extends Home {
             new Filter("Eredeti", c -> Color.color(c.getRed(), c.getGreen(), c.getBlue()))
     );
 
+    public void setOriginal(Image original) {
+        this.original = original;
+    }
+
     private double valueOf(Color c) {
         return c.getRed() + c.getGreen() + c.getBlue();
     }
 
-    public Image createFilter() {
-
-        AtomicBoolean eredetiE = new AtomicBoolean(false);
-
+    public void createFilter() {
+        original = imageView.getImage();
         filters.forEach(filterItem -> {
             MenuItem item = new MenuItem(filterItem.name);
             filterButton.getItems().add(item);
-
             if (Objects.equals(item.getText(), "Eredeti")) {
-                eredetiE.set(true);
+                imageChanger.endSlideShow();
+                imageView.setImage(original);
             }
-
             item.setOnAction(e -> {
-                imageView2.setImage(filterItem.apply(imageView.getImage()));
-
+                imageChanger.endSlideShow();
+                imageView.setImage(filterItem.apply(original));
             });
-
         });
-
-        if (eredetiE.get()) {
-            return imageView.getImage();
-        } else {
-            return imageView2.getImage();
-        }
     }
 
     private static class Filter implements Function<Image, Image> {
