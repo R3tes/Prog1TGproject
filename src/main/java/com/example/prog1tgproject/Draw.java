@@ -62,9 +62,11 @@ public class Draw {
 
     public void initializeDraw() {
         image = imageView.getImage();
+        
         double aspectRatio = image.getWidth() / image.getHeight();
         double realWidth = Math.min(imageView.getFitWidth(), imageView.getFitHeight() * aspectRatio);
         double realHeight = Math.min(imageView.getFitHeight(), imageView.getFitWidth() / aspectRatio);
+        
         canvasDraw.setHeight(realHeight);
         canvasDraw.setWidth(realWidth);
 

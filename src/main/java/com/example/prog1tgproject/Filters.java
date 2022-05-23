@@ -1,24 +1,17 @@
 package com.example.prog1tgproject;
 
-import javafx.application.Application;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class Filters extends Home {
@@ -27,6 +20,7 @@ public class Filters extends Home {
     private final StackPane container;
     private final ImageView imageView;
     private Image image;
+    public ImageView imageView2 = new ImageView();
 
     public Filters(MenuButton filterButton, ImageView imageView, StackPane container) {
         this.filterButton = filterButton;
@@ -34,15 +28,13 @@ public class Filters extends Home {
         this.container = container;
     }
 
-    //private final List<MenuItem> menuItems = new ArrayList<>();
-
     private List<Filter> filters = Arrays.asList(
-            new Filter("Inverz", c -> c.invert()),
-            new Filter("Szürkeskála", c -> c.grayscale()),
+            new Filter("Inverz", Color::invert), new Filter("Szürkeskála", Color::grayscale),
             new Filter("Fekete-fehér", c -> valueOf(c) < 1.5 ? Color.BLACK : Color.WHITE),
             new Filter("Vörös", c -> Color.color(1.0, c.getGreen(), c.getBlue())),
             new Filter("Zöld", c -> Color.color(c.getRed(), 1.0, c.getBlue())),
-            new Filter("Kék", c -> Color.color(c.getRed(), c.getGreen(), 1.0))
+            new Filter("Kék", c -> Color.color(c.getRed(), c.getGreen(), 1.0)),
+            new Filter("Eredeti", c -> Color.color(c.getRed(), c.getGreen(), c.getBlue()))
     );
 
     private double valueOf(Color c) {
@@ -50,18 +42,29 @@ public class Filters extends Home {
     }
 
     public Image createFilter() {
-        ImageView imageView2 = new ImageView();
+
+        AtomicBoolean eredetiE = new AtomicBoolean(false);
 
         filters.forEach(filterItem -> {
             MenuItem item = new MenuItem(filterItem.name);
+            filterButton.getItems().add(item);
+
+            if (Objects.equals(item.getText(), "Eredeti")) {
+                eredetiE.set(true);
+            }
+
             item.setOnAction(e -> {
                 imageView2.setImage(filterItem.apply(imageView.getImage()));
+
             });
 
-            filterButton.getItems().add(item);
         });
 
-        return imageView2.getImage();
+        if (eredetiE.get()) {
+            return imageView.getImage();
+        } else {
+            return imageView2.getImage();
+        }
     }
 
     private static class Filter implements Function<Image, Image> {
@@ -93,6 +96,5 @@ public class Filters extends Home {
             return image;
         }
     }
-
 
 }

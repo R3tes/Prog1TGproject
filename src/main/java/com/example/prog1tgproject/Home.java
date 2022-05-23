@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -82,7 +83,6 @@ public class Home {
     @FXML
     private Button undoDrawButton, saveDrawButton, redoDrawButton;
 
-
     File currentFile;
     ImageChanger imageChanger;
     BufferedImage img;
@@ -107,11 +107,7 @@ public class Home {
         root.setFillHeight(true);
         HBox.setHgrow(container, Priority.ALWAYS);
 
-        /*Filters filters = new Filters(filterButton, imageView, container);
-        //imageView.setImage(filters.createFilter());
-        filterButton.setOnKeyPressed(actionEvent -> {
-            imageView.setImage(filters.createFilter());
-        });*/
+        Filters filters = new Filters(filterButton, imageView, container);
 
         MenuItem open = new MenuItem("Megnyitás");
         MenuItem save = new MenuItem("Mentés");
@@ -143,7 +139,7 @@ public class Home {
                         String extension = imageChanger.getCurrentImage().getAbsolutePath()
                                 .substring(imageChanger.getCurrentImage().getAbsolutePath().length() - 3);
                         File targetDirectory = new File(newAlbum.getAbsolutePath() + "/" + imageChanger.getCurrentImage().getName());
-                        saveImage(extension, targetDirectory);
+                        saveImage(img, extension, targetDirectory);
                     }
                     loadAlbums();
                 } else {
@@ -156,10 +152,17 @@ public class Home {
 
         });
 
+        prop.setOnAction(actionEvent -> {
+
+        });
+
         open.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 imageChanger.endSlideShow();
+
+                refreshDraw();
+
                 File file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
                 if (file != null) {
                     imageChanger.getAlbum().setPath(file.getParent());
@@ -178,6 +181,9 @@ public class Home {
             @Override
             public void handle(ActionEvent actionEvent) {
                 imageChanger.endSlideShow();
+
+                refreshDraw();
+
                 imageChanger.getAlbum().getImages().remove(imageChanger.getCurrentImage());
                 imageChanger.getCurrentImage().delete();
                 imageView.setImage(null);
@@ -190,35 +196,56 @@ public class Home {
             @Override
             public void handle(ActionEvent actionEvent) {
                 imageChanger.endSlideShow();
+
+                refreshDraw();
+
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
                     String extension = dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3);
-                    saveImage(extension, dir);
+                    saveImage(img, extension, dir);
                 }
             }
         });
 
-        /*saveDrawButton.setOnAction((e) -> {
+        saveDrawButton.setOnAction((e) -> {
             FileChooser savefile = new FileChooser();
             new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
             savefile.setTitle("Save File");
 
-            double aspectRatio = img.getWidth() / img.getHeight();
-            double realWidth = Math.max(imageView.getFitWidth(), imageView.getFitHeight() * aspectRatio);
-            double realHeight = Math.max(imageView.getFitHeight(), imageView.getFitWidth() / aspectRatio);
-
             File file = savefile.showSaveDialog(imageView.getScene().getWindow());
             if (file != null) {
-                try {
-                    WritableImage writableImage = new WritableImage((int) realWidth, (int) realHeight);
+
+                double aspectRatio = img.getWidth() / img.getHeight();
+                double realWidth = Math.min(imageView.getFitWidth(), imageView.getFitHeight() * aspectRatio);
+                double realHeight = Math.min(imageView.getFitHeight(), imageView.getFitWidth() / aspectRatio);
+
+                int initialWidth = (int)container.getWidth();
+                int initialHeight = (int)container.getHeight();
+                container.resize(realWidth, (int)imageView.getLayoutBounds().getHeight());
+
+                WritableImage writableImage = container.snapshot(new SnapshotParameters(), null);
+
+                System.out.println(writableImage.getWidth() + " " + writableImage.getHeight());
+                BufferedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+                String extension = file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3);
+                saveImage(renderedImage, extension, file);
+
+                container.resize(initialWidth, initialHeight);
+                /*try {
+                    System.out.println(img.getWidth() + " " + img.getHeight());
+                    WritableImage writableImage = new WritableImage(img.getWidth(), img.getHeight());
                     container.snapshot(new SnapshotParameters(), writableImage);
                     RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
-                    ImageIO.write(renderedImage, "png", file);
+                    String extension = file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3);
+                    saveImage((BufferedImage) renderedImage, extension, file);
+                    System.out.println(file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3));
+                    ImageIO.write(renderedImage, file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3), file);
                 } catch (IOException ex) {
                     System.out.println("Error!");
                 }
+*/
             }
-        });*/
+        });
 
         setGraphic(prevImageButton, "/media/left-button.png", 43, 43);
         prevImageButton.setOnAction(event -> {
@@ -226,6 +253,8 @@ public class Home {
             imageChanger.previousImage(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
+
+            refreshDraw();
         });
 
         setGraphic(nextImageButton, "/media/right-button.png", 43, 43);
@@ -235,6 +264,7 @@ public class Home {
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
 
+            refreshDraw();
         });
 
         opButton.setOnKeyPressed(keyEvent -> {
@@ -243,17 +273,24 @@ public class Home {
                 imageChanger.previousImage(imageView);
                 setBufferedImage(imageChanger.getCurrentImage());
                 zoom.refresh(imageView);
+
+                refreshDraw();
             }
             if (keyEvent.getCode() == KeyCode.RIGHT) {
                 imageChanger.endSlideShow();
                 imageChanger.nextImage(imageView);
                 setBufferedImage(imageChanger.getCurrentImage());
                 zoom.refresh(imageView);
+
+                refreshDraw();
             }
         });
 
         slideShowButton.setOnAction(event -> {
             imageChanger.endSlideShow();
+
+            refreshDraw();
+
             imageChanger.startSlideShow(imageView);
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.refresh(imageView);
@@ -263,10 +300,7 @@ public class Home {
         zoomInButton.setOnAction(event -> {
             imageChanger.endSlideShow();
 
-            setDrawToDefault();
-            canvasDraw.setVisible(false);
-            drawSlider.setVisible(false);
-            drawButton.setSelected(false);
+            refreshDraw();
             
             setBufferedImage(imageChanger.getCurrentImage());
             zoom.setZoom(34, imageView.getImage().getWidth() / 2, imageView.getImage().getHeight() / 2);
@@ -276,10 +310,7 @@ public class Home {
         zoomOutButton.setOnAction(event -> {
             imageChanger.endSlideShow();
 
-            setDrawToDefault();
-            canvasDraw.setVisible(false);
-            drawSlider.setVisible(false);
-            drawButton.setSelected(false);
+            refreshDraw();
 
             setDrawToDefault();
             setBufferedImage(imageChanger.getCurrentImage());
@@ -306,6 +337,10 @@ public class Home {
             }
         });
 
+        //imageView.setImage(filters.createFilter());
+        filterButton.setOnKeyPressed(actionEvent -> {
+            imageView.setImage(filters.createFilter());
+        });
 
     }
 
@@ -370,15 +405,15 @@ public class Home {
         button.setGraphic(image);
     }
 
-    public void saveImage(String extension, File targetDirectory) {
+    public void saveImage(BufferedImage imageToSave, String extension, File targetDirectory) {
         try {
-            boolean isSaved = ImageIO.write(img, extension, targetDirectory);
+            boolean isSaved = ImageIO.write(imageToSave, extension, targetDirectory);
             if (!isSaved) {
-                BufferedImage image = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+                BufferedImage image = new BufferedImage(imageToSave.getWidth(), imageToSave.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-                for (int y = 0; y < img.getHeight(); y++) {
-                    for (int x = 0; x < img.getWidth(); x++) {
-                        image.setRGB(x, y, img.getRGB(x, y));
+                for (int y = 0; y < imageToSave.getHeight(); y++) {
+                    for (int x = 0; x < imageToSave.getWidth(); x++) {
+                        image.setRGB(x, y, imageToSave.getRGB(x, y));
                     }
                 }
 
@@ -407,7 +442,7 @@ public class Home {
                     String extension = imageChanger.getCurrentImage().getAbsolutePath()
                             .substring(imageChanger.getCurrentImage().getAbsolutePath().length() - 3);
                     File targetDirectory = new File(album.getPath().replace('\\', '/') + "/" + imageChanger.getCurrentImage().getName());
-                    saveImage(extension, targetDirectory);
+                    saveImage(img, extension, targetDirectory);
                 });
 
                 MenuItem renameAlbum = new MenuItem("Átnevezés");
@@ -483,5 +518,12 @@ public class Home {
         colorDrawPicker.setValue(Color.WHITE);
         pencilstrDrawSlider.setValue(0);
         writeTextField.setText("");
+    }
+    
+    public void refreshDraw(){
+        setDrawToDefault();
+        canvasDraw.setVisible(false);
+        drawSlider.setVisible(false);
+        drawButton.setSelected(false);
     }
 }
