@@ -411,6 +411,23 @@ public class Home {
                     });
                     toolBar.getItems().add(button);
                 }
+                if(paths.length == 0){
+                    for (int i = 0; i < plugin.getName().length; i++) {
+                        Button button = new Button(plugin.getName()[i]);
+                        button.setCursor(Cursor.HAND);
+                        int finalI = i;
+                        button.setOnAction(event -> {
+                            if (ImageChanger.timer != null) {
+                                setBufferedImage(imageChanger.getCurrentImage());
+                            }
+                            imageChanger.endSlideShow();
+                            img = plugin.process(imageView, img, finalI);
+                            imageView.setImage(convertToFxImage(img));
+                            zoom.refresh(imageView);
+                        });
+                        toolBar.getItems().add(button);
+                    }
+                }
             }
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

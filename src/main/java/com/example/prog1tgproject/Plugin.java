@@ -10,5 +10,6 @@ import java.awt.image.BufferedImage;
 public interface Plugin {
 
     String[] getImagePaths();
+    String[] getName();
     BufferedImage process(ImageView imageView, BufferedImage bimage, int code);
 }
