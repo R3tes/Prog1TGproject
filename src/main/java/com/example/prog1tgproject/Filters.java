@@ -5,13 +5,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class Filters extends Home {
@@ -29,7 +27,7 @@ public class Filters extends Home {
     }
 
     private List<Filter> filters = Arrays.asList(
-            new Filter("Inverz", Color::invert), new Filter("Szürkeskála", Color::grayscale),
+            new Filter("Inverz", Color::invert), new Filter("Szürkeárnyalat", Color::grayscale),
             new Filter("Fekete-fehér", c -> valueOf(c) < 1.5 ? Color.BLACK : Color.WHITE),
             new Filter("Vörös", c -> Color.color(1.0, c.getGreen(), c.getBlue())),
             new Filter("Zöld", c -> Color.color(c.getRed(), 1.0, c.getBlue())),

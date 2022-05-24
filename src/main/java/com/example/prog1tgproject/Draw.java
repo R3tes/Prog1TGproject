@@ -199,6 +199,7 @@ public class Draw {
 
         //Undo Button
         undoDrawButton.setOnAction(e -> {
+
             if (!undoHistory.empty()) {
                 gc.clearRect(0, 0, 1080, 790);
                 Shape removedShape = undoHistory.lastElement();
@@ -221,19 +222,15 @@ public class Draw {
                     tempCirc.setFill(gc.getFill());
                     tempCirc.setStroke(gc.getStroke());
                     redoHistory.push(new Circle(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius()));
-                } else if (removedShape.getClass() == Ellipse.class) {
-                    Ellipse tempElps = (Ellipse) removedShape;
-                    tempElps.setFill(gc.getFill());
-                    tempElps.setStroke(gc.getStroke());
-                    tempElps.setStrokeWidth(gc.getLineWidth());
-                    redoHistory.push(new Ellipse(tempElps.getCenterX(), tempElps.getCenterY(), tempElps.getRadiusX(), tempElps.getRadiusY()));
                 }
+
                 Shape lastRedo = redoHistory.lastElement();
                 lastRedo.setFill(removedShape.getFill());
                 lastRedo.setStroke(removedShape.getStroke());
                 lastRedo.setStrokeWidth(removedShape.getStrokeWidth());
                 undoHistory.pop();
 
+                gc.drawImage(imageView.getImage(), 0, 0, canvasDraw.getWidth(), canvasDraw.getHeight());
                 for (int i = 0; i < undoHistory.size(); i++) {
                     Shape shape = undoHistory.elementAt(i);
                     if (shape.getClass() == Line.class) {
@@ -256,13 +253,6 @@ public class Draw {
                         gc.setFill(temp.getFill());
                         gc.fillOval(temp.getCenterX(), temp.getCenterY(), temp.getRadius(), temp.getRadius());
                         gc.strokeOval(temp.getCenterX(), temp.getCenterY(), temp.getRadius(), temp.getRadius());
-                    } else if (shape.getClass() == Ellipse.class) {
-                        Ellipse temp = (Ellipse) shape;
-                        gc.setLineWidth(temp.getStrokeWidth());
-                        gc.setStroke(temp.getStroke());
-                        gc.setFill(temp.getFill());
-                        gc.fillOval(temp.getCenterX(), temp.getCenterY(), temp.getRadiusX(), temp.getRadiusY());
-                        gc.strokeOval(temp.getCenterX(), temp.getCenterY(), temp.getRadiusX(), temp.getRadiusY());
                     }
                 }
             } else {
@@ -295,12 +285,6 @@ public class Draw {
                     gc.strokeOval(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius(), tempCirc.getRadius());
 
                     undoHistory.push(new Circle(tempCirc.getCenterX(), tempCirc.getCenterY(), tempCirc.getRadius()));
-                } else if (shape.getClass() == Ellipse.class) {
-                    Ellipse tempElps = (Ellipse) shape;
-                    gc.fillOval(tempElps.getCenterX(), tempElps.getCenterY(), tempElps.getRadiusX(), tempElps.getRadiusY());
-                    gc.strokeOval(tempElps.getCenterX(), tempElps.getCenterY(), tempElps.getRadiusX(), tempElps.getRadiusY());
-
-                    undoHistory.push(new Ellipse(tempElps.getCenterX(), tempElps.getCenterY(), tempElps.getRadiusX(), tempElps.getRadiusY()));
                 }
                 Shape lastUndo = undoHistory.lastElement();
                 lastUndo.setFill(gc.getFill());

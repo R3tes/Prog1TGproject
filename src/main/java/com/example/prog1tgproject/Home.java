@@ -1,5 +1,6 @@
 package com.example.prog1tgproject;
 
+import javax.imageio.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -11,6 +12,11 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -19,8 +25,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -29,6 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -109,7 +118,7 @@ public class Home {
         MenuItem save = new MenuItem("Mentés");
         MenuItem savAs = new MenuItem("Mentés másként");
         MenuItem delete = new MenuItem("Törlés");
-        MenuItem prop = new MenuItem("Részletek");
+        MenuItem prop = new MenuItem("Kép részletek");
         opButton.getItems().add(open);
         opButton.getItems().add(save);
         opButton.getItems().add(savAs);
@@ -150,7 +159,40 @@ public class Home {
         });
 
         prop.setOnAction(actionEvent -> {
+            if(imageView.getImage()!=null){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Kép részletei");
+                alert.setHeaderText(null);
 
+                String imgExtension = "";
+                String imgName = "";
+                File dir = imageChanger.getCurrentImage();
+                if (dir != null) {
+                    imgExtension = dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3);
+                }
+                imgName = dir.getName().substring(0, dir.getName().length() - imgExtension.length() - 1);
+                BufferedImage image = img;
+                int clr = image.getRGB(img.getMinX(), img.getMinY());
+                int red =   (clr & 0x00ff0000) >> 16;
+                int green = (clr & 0x0000ff00) >> 8;
+                int blue =   clr & 0x000000ff;
+
+                alert.setContentText("Kép neve: " + imgName +
+                        "\nKiterjeszése: (." + imgExtension + ")" +
+                        "\nElérési útvonal: " + dir.getAbsolutePath() +
+                        "\nDimenziók: " + img.getWidth() + " x " + img.getHeight() +
+                        "\nSzélesség: " + img.getWidth() + " pixel" +
+                        "\nMagasság: " + img.getHeight() + " pixel" +
+                        "\nVörös: " + red + " R" +
+                        "\nZöld: " + green + " G" +
+                        "\nKék: " + blue + " B" );
+
+                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                stage.getIcons().add(new Image(this.getClass().getResource("/app-logo.png").toString()));
+                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+                alert.showAndWait();
+            }
         });
 
         save.setOnAction(new EventHandler<ActionEvent>() {
@@ -159,11 +201,12 @@ public class Home {
                 imageChanger.endSlideShow();
 
                 refreshDraw();
+                BufferedImage bimg = SwingFXUtils.fromFXImage(imageView.getImage(), null);
 
                 File dir = imageChanger.getCurrentImage();
                 if (dir != null) {
                     String extension = dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3);
-                    saveImage(img, extension, dir);
+                    saveImage(bimg, extension, dir);
                 }
             }
         });
@@ -211,11 +254,12 @@ public class Home {
                 imageChanger.endSlideShow();
 
                 refreshDraw();
+                BufferedImage bimg = SwingFXUtils.fromFXImage(imageView.getImage(), null);
 
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
                     String extension = dir.getAbsolutePath().substring(dir.getAbsolutePath().length() - 3);
-                    saveImage(img, extension, dir);
+                    saveImage(bimg, extension, dir);
                 }
             }
         });
@@ -230,10 +274,12 @@ public class Home {
 
                 WritableImage writableImage = canvasDraw.snapshot(new SnapshotParameters(), null);
 
-                System.out.println(writableImage.getWidth() + " " + writableImage.getHeight());
+                //System.out.println(writableImage.getWidth() + " " + writableImage.getHeight());
                 BufferedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
                 String extension = file.getAbsolutePath().substring(file.getAbsolutePath().length() - 3);
                 saveImage(renderedImage, extension, file);
+
+                refreshDraw();
             }
         });
 
