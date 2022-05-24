@@ -19,6 +19,11 @@ public class Rotate implements Plugin {
     }
 
     @Override
+    public String[] getName() {
+        return new String[]{"Forgatás"};
+    }
+
+    @Override
     public BufferedImage process(ImageView imageView, BufferedImage bimage, int code) {
         if(imageView.getImage() != null){
             double rads = 0;
