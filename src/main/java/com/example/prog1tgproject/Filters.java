@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class Filters extends Home {
@@ -52,8 +53,10 @@ public class Filters extends Home {
                 imageChanger.endSlideShow();
                 imageView.setImage(original);
             }
+
             item.setOnAction(e -> {
                 imageChanger.endSlideShow();
+
                 imageView.setImage(filterItem.apply(original));
             });
         });
@@ -71,21 +74,28 @@ public class Filters extends Home {
 
         @Override
         public Image apply(Image source) {
-            int imgWidth = (int) source.getWidth();
-            int imgHeight = (int) source.getHeight();
+            WritableImage image = null;
 
-            WritableImage image = new WritableImage(imgWidth, imgHeight);
+            try {
+                int imgWidth = (int) source.getWidth();
+                int imgHeight = (int) source.getHeight();
 
-            for (int y = 0; y < imgHeight; y++) {
-                for (int x = 0; x < imgWidth; x++) {
-                    Color c1 = source.getPixelReader().getColor(x, y);
-                    Color c2 = colorMap.apply(c1);
+                image = new WritableImage(imgWidth, imgHeight);
 
-                    image.getPixelWriter().setColor(x, y, c2);
+                for (int y = 0; y < imgHeight; y++) {
+                    for (int x = 0; x < imgWidth; x++) {
+                        Color c1 = source.getPixelReader().getColor(x, y);
+                        Color c2 = colorMap.apply(c1);
+
+                        image.getPixelWriter().setColor(x, y, c2);
+                    }
                 }
-            }
 
-            return image;
+            } catch (NullPointerException ex) {
+
+            } finally {
+                return image;
+            }
         }
     }
 

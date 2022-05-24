@@ -201,7 +201,13 @@ public class Home {
                 imageChanger.endSlideShow();
 
                 refreshDraw();
-                BufferedImage bimg = SwingFXUtils.fromFXImage(imageView.getImage(), null);
+
+                BufferedImage bimg = null;
+                try {
+                    bimg = SwingFXUtils.fromFXImage(imageView.getImage(), null);
+                } catch (NullPointerException ex){
+
+                }
 
                 File dir = imageChanger.getCurrentImage();
                 if (dir != null) {
@@ -254,7 +260,13 @@ public class Home {
                 imageChanger.endSlideShow();
 
                 refreshDraw();
-                BufferedImage bimg = SwingFXUtils.fromFXImage(imageView.getImage(), null);
+
+                BufferedImage bimg = null;
+                try {
+                    bimg = SwingFXUtils.fromFXImage(imageView.getImage(), null);
+                } catch (NullPointerException ex){
+
+                }
 
                 File dir = fileChooser.showSaveDialog(opButton.getScene().getWindow());
                 if (dir != null) {
@@ -408,6 +420,8 @@ public class Home {
                         img = plugin.process(imageView, img, finalI);
                         imageView.setImage(convertToFxImage(img));
                         zoom.refresh(imageView);
+
+                        refreshDraw();
                     });
                     toolBar.getItems().add(button);
                 }
